@@ -1,28 +1,99 @@
-.sticky-sidebar {
+/* Custom Styles for GD&T App */
+
+/* Logo Styling */
+.logo-main {
+    font-size: 2.2rem;
+    line-height: 0.8;
+}
+.logo-sub {
+    font-size: 0.9rem;
+    letter-spacing: 0.8px;
+}
+
+/* Navbar & Nav Items */
+.main-nav {
+    background-color: #d32f2f !important; /* Màu đỏ đậm đặc trưng */
+}
+.nav-link-custom {
+    font-size: 0.85rem;
+    letter-spacing: 0.2px;
+    transition: background-color 0.2s;
+}
+.nav-link-custom:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Sidebar & Recursive Menu */
+.sidebar-card {
     position: sticky;
-    top: 80px;
+    top: 85px;
 }
-
 .category-item {
-    color: #444;
-    text-decoration: none;
-    font-weight: 500;
-    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+    color: #333;
 }
-
 .category-item:hover {
-    background-color: #fef2f2 !important;
-    color: #dc3545 !important;
+    background-color: #f8d7da;
+    color: #d32f2f;
+    padding-left: 12px !important;
 }
 
-.article-body {
-    font-size: 1.15rem;
+/* News Cards */
+.news-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    background-color: #fff;
+}
+.news-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.15)!important;
+}
+.featured-img-box {
+    min-width: 50%;
+    min-height: 300px;
+}
+.object-fit-cover {
+    object-fit: cover;
+}
+.hover-blue:hover {
+    color: #d32f2f !important;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* Banner Side */
+.baoin-banner {
+    background: linear-gradient(135deg, #d32f2f 0%, #ff5252 100%);
+    height: 180px;
+    cursor: pointer;
+}
+
+/* Article Modal Content Styling */
+.article-content-body {
     line-height: 1.8;
+    font-size: 1.15rem;
     color: #2c3e50;
+    font-family: 'Merriweather', Georgia, serif;
+}
+.article-content-body img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 25px 0;
+}
+.article-content-body p {
+    margin-bottom: 1.5rem;
+    text-align: justify;
 }
 
-.article-body img {
-    width: 100%;
-    height: auto;
-    margin: 20px 0;
+/* Animation for Trending Bar */
+.scroll-text {
+    white-space: nowrap;
+}
+
+/* General Layout */
+.app-container {
+    background-color: #f4f6f9;
+    min-height: 100vh;
 }
