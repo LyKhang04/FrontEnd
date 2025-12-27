@@ -1,43 +1,162 @@
+/* =========================================
+   1. GLOBAL SETTINGS
+   ========================================= */
 body {
-    background-color: #f4f6f9;
+    background-color: #f9fafb;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: #212529;
 }
 
-.category-item {
+.app-container {
+    min-height: 100vh;
+}
+
+.cursor-pointer {
     cursor: pointer;
-    transition: all 0.2s;
-    font-size: 0.95rem;
 }
 
-.category-item:hover {
-    background-color: #e9ecef;
-    color: #0d6efd;
+/* =========================================
+   2. HEADER & TOP BAR
+   ========================================= */
+.top-info-bar {
+    font-size: 0.8rem;
     font-weight: 500;
 }
 
+.logo-main {
+    font-family: Arial, Helvetica, sans-serif;
+    letter-spacing: -1px;
+}
+
+.sub-logo-box {
+    min-width: 140px;
+}
+
+@media (max-width: 768px) {
+    .header-right-section {
+        width: 100% !important;
+        justify-content: space-between !important;
+    }
+    .logo-box {
+        margin-bottom: 10px;
+    }
+}
+
+/* =========================================
+   3. NAVIGATION BAR (RED)
+   ========================================= */
+.main-nav {
+    background-color: #c92127 !important; /* Màu đỏ thương hiệu */
+    min-height: 46px;
+}
+
+.bg-danger-dark {
+    background-color: #a01a1f; /* Màu nền đậm cho nút Home */
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.nav-link-custom {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    font-weight: 600 !important;
+    white-space: nowrap;
+    opacity: 0.9;
+    transition: all 0.2s;
+}
+
+.nav-link-custom:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    opacity: 1;
+}
+
+/* =========================================
+   4. CONTENT & CARDS
+   ========================================= */
 .news-card {
-    transition: transform 0.2s;
-    border: none;
+    background: #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .news-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.featured-card {
+    border-bottom: 3px solid #c92127 !important;
+}
+
+.featured-img-box {
+    min-width: 50%;
+    min-height: 300px;
 }
 
 .hover-blue:hover {
-    color: #0d6efd !important;
+    color: #c92127 !important;
+    cursor: pointer;
+    text-decoration: underline;
 }
 
-/* Style cho nội dung crawl về */
-.article-body img {
-    display: block;
-    margin: 15px auto;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+/* =========================================
+   5. SIDEBAR ELEMENTS
+   ========================================= */
+.sidebar-card {
+    position: sticky;
+    top: 60px; /* Dính khi cuộn */
 }
 
-.article-body p {
-    line-height: 1.6;
-    margin-bottom: 1rem;
+.category-item {
+    color: #444;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.category-item:hover {
+    background-color: #fee2e2;
+    color: #c92127;
+    padding-left: 12px !important;
+}
+
+.baoin-banner {
+    background: linear-gradient(135deg, #c92127 0%, #ff5252 100%);
+    margin-top: 20px;
+    height: 150px;
+    transition: transform 0.2s;
+}
+
+.baoin-banner:hover {
+    transform: scale(1.02);
+}
+
+/* =========================================
+   6. ARTICLE DETAIL CONTENT (MODAL)
+   ========================================= */
+.article-content-body {
+    font-family: 'Merriweather', Georgia, serif; /* Font chữ báo chí */
+    line-height: 1.8;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.article-content-body p {
+    margin-bottom: 1.5rem;
     text-align: justify;
+}
+
+.article-content-body img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    margin: 20px auto;
+}
+
+.article-content-body h1,
+.article-content-body h2,
+.article-content-body h3 {
+    font-weight: 700;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    color: #000;
 }

@@ -1,149 +1,214 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Navbar, Button, Modal, Spinner, Breadcrumb } from 'react-bootstrap';
-import { XMLParser } from 'fast-xml-parser'; // Thư viện parse XML chuẩn
+import { Container, Row, Col, Navbar, Nav, Form, FormControl, Button, Card, Modal, Spinner } from 'react-bootstrap';
+import { XMLParser } from 'fast-xml-parser';
 import axios from 'axios';
-import { CATEGORY_TREE } from './data';
+import { CATEGORY_TREE } from './data'; // Đảm bảo bạn đã có file data.js
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
 
+// Danh sách menu trên thanh đỏ
+const NAV_MENU_ITEMS = [
+    "Giáo dục", "Thời sự", "Giáo dục pháp luật", "Kết nối", "Trao đổi",
+    "Học đường", "Nhân ái", "Thế giới", "Sức khoẻ", "Media", "Văn hóa", "Thể thao"
+];
+
 function App() {
-    const [articles, setArticles] = useState([]); // Danh sách tin
-    const [loading, setLoading] = useState(false); // Trạng thái loading tin
-    const [crawling, setCrawling] = useState(false); // Trạng thái loading chi tiết
-    const [currentCategory, setCurrentCategory] = useState("Trang chủ");
-
-    // State cho bài viết chi tiết
+    const [articles, setArticles] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [selectedArticle, setSelectedArticle] = useState(null);
-    const [articleContent, setArticleContent] = useState("");
+    const [detailContent, setDetailContent] = useState("");
+    const [isCrawling, setIsCrawling] = useState(false);
+    const [currentCatName, setCurrentCatName] = useState("Trang chủ");
 
-    // --- HÀM 1: LẤY DANH SÁCH TIN TỪ RSS (XML) ---
-    const fetchRSS = async (url, categoryName) => {
-        if (!url) return;
+    // --- HÀM 1: LẤY RSS TỪ URL ---
+    const fetchRSS = async (url, name) => {
         setLoading(true);
-        setCurrentCategory(categoryName);
+        setCurrentCatName(name);
         try {
-            // Dùng Proxy allorigins để bypass CORS
-            const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-            const response = await axios.get(proxy);
-
-            // Parse XML sang JSON
-            const parser = new XMLParser();
-            const jsonData = parser.parse(response.data);
-
-            // Xử lý an toàn dữ liệu (tránh lỗi nếu chỉ có 1 bài viết)
-            const items = jsonData?.rss?.channel?.item;
-            const list = Array.isArray(items) ? items : (items ? [items] : []);
-
-            setArticles(list);
-        } catch (error) {
-            console.error("Lỗi lấy RSS:", error);
-            alert("Không thể lấy dữ liệu từ nguồn này.");
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+            const res = await axios.get(proxyUrl);
+            const parser = new XMLParser({ ignoreAttributes: false });
+            const result = parser.parse(res.data);
+            const items = result?.rss?.channel?.item;
+            // Đảm bảo luôn trả về mảng
+            setArticles(Array.isArray(items) ? items : (items ? [items] : []));
+            window.scrollTo(0, 0);
+        } catch (err) {
+            console.error("Lỗi tải RSS:", err);
         } finally {
             setLoading(false);
         }
     };
 
-    // --- HÀM 2: CRAWL DỮ LIỆU CHI TIẾT TỪ HTML ---
-    const handleCrawlDetail = async (article) => {
+    // --- HÀM 2: CRAWL DỮ LIỆU CHI TIẾT ---
+    const crawlArticle = async (article) => {
         setSelectedArticle(article);
-        setCrawling(true);
-        setArticleContent(""); // Reset nội dung cũ
-
+        setIsCrawling(true);
+        setDetailContent("");
         try {
-            // 1. Lấy Source HTML của trang chi tiết qua Proxy
-            const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(article.link)}`;
-            const response = await axios.get(proxy);
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(article.link)}`;
+            const res = await axios.get(proxyUrl);
+            const dom = new DOMParser().parseFromString(res.data, 'text/html');
 
-            // 2. Dùng DOMParser để biến string HTML thành Document Object
-            const domParser = new DOMParser();
-            const doc = domParser.parseFromString(response.data, "text/html");
+            // Chọn vùng nội dung chính (tùy chỉnh theo cấu trúc báo GD&T)
+            const content = dom.querySelector('.detail-content') || dom.querySelector('article') || dom.querySelector('.content');
 
-            // 3. SELECTOR QUAN TRỌNG: Tìm div chứa nội dung bài viết của báo GD&T
-            // Báo GD&T thường dùng class 'detail-content' hoặc thẻ 'article'
-            let contentNode = doc.querySelector(".detail-content") || doc.querySelector("article");
-
-            if (contentNode) {
-                // 4. Clean dữ liệu: Xóa các phần không cần thiết (Quảng cáo, tin liên quan)
-                const junkSelectors = [".box-related", ".ads", ".banner", "script", "style"];
-                junkSelectors.forEach(sel => {
-                    contentNode.querySelectorAll(sel).forEach(el => el.remove());
+            if (content) {
+                // Xử lý ảnh và xóa rác
+                content.querySelectorAll('img').forEach(img => {
+                    img.className = "img-fluid rounded shadow-sm my-3 d-block mx-auto";
+                    const src = img.getAttribute('src');
+                    if (src && src.startsWith('/')) {
+                        img.src = `https://giaoducthoidai.vn${src}`;
+                    }
                 });
-
-                // 5. Fix ảnh: Đảm bảo ảnh hiển thị responsive
-                contentNode.querySelectorAll("img").forEach(img => {
-                    img.style.maxWidth = "100%";
-                    img.style.height = "auto";
-                    // Xử lý lazy load nếu ảnh chưa load
-                    if(img.dataset.src) img.src = img.dataset.src;
-                });
-
-                setArticleContent(contentNode.innerHTML);
+                content.querySelectorAll(".box-related, .ads, .banner, script").forEach(el => el.remove());
+                setDetailContent(content.innerHTML);
             } else {
-                setArticleContent("<p>Không thể bóc tách nội dung tự động. Vui lòng xem link gốc.</p>");
+                setDetailContent("<p class='text-center py-3'>Không thể tự động lấy nội dung. <a href='"+article.link+"' target='_blank'>Xem bài viết gốc</a></p>");
             }
-        } catch (error) {
-            console.error("Lỗi Crawl:", error);
-            setArticleContent("<p>Lỗi kết nối khi tải chi tiết bài viết.</p>");
+        } catch (err) {
+            setDetailContent("<p class='text-danger text-center'>Lỗi kết nối khi tải nội dung.</p>");
         } finally {
-            setCrawling(false);
+            setIsCrawling(false);
         }
     };
 
-    // Khởi chạy lần đầu
     useEffect(() => {
-        fetchRSS(CATEGORY_TREE[0].url, CATEGORY_TREE[0].name);
+        // Tự động tải trang chủ khi mở App
+        if (CATEGORY_TREE.length > 0) {
+            fetchRSS(CATEGORY_TREE[0].url, CATEGORY_TREE[0].name);
+        }
     }, []);
+
+    // --- COMPONENT MENU ĐỆ QUY BÊN TRÁI ---
+    const RecursiveMenu = ({ items, level = 0 }) => (
+        <ul className={`list-unstyled mb-0 ${level > 0 ? 'ms-3 border-start ps-2' : ''}`}>
+            {items.map((cat, idx) => (
+                <li key={idx} className="mb-1">
+                    <div
+                        className="category-item p-2 rounded d-flex align-items-center"
+                        onClick={() => cat.url && fetchRSS(cat.url, cat.name)}
+                    >
+                        <i className={`bi ${cat.children ? 'bi-folder2' : 'bi-dot'} me-2`}></i>
+                        <span className="text-truncate">{cat.name}</span>
+                    </div>
+                    {cat.children && <RecursiveMenu items={cat.children} level={level + 1} />}
+                </li>
+            ))}
+        </ul>
+    );
 
     return (
         <div className="app-container">
-            <Navbar bg="primary" variant="dark" className="shadow-sm mb-4">
+            {/* 1. TOP INFO BAR (Ngày, Hotline, Email) */}
+            <div className="top-info-bar bg-light border-bottom py-1">
+                <Container className="d-flex justify-content-start align-items-center small text-secondary flex-wrap">
+                    <span className="me-3 mb-1"><i className="bi bi-clock me-1"></i> {new Date().toLocaleDateString('vi-VN', {weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit'})}</span>
+                    <span className="me-3 mb-1 border-start ps-3"><i className="bi bi-telephone me-1"></i> Hotline: <strong className="text-danger">096.733.5089</strong></span>
+                    <span className="mb-1 border-start ps-3"><i className="bi bi-envelope me-1"></i> Email: <span className="text-primary">gdtddientu@gmail.com</span></span>
+                </Container>
+            </div>
+
+            {/* 2. HEADER LOGO & SEARCH */}
+            <header className="bg-white py-3">
+                <Container className="d-flex justify-content-between align-items-end flex-wrap">
+                    {/* Logo Chính */}
+                    <div className="logo-box text-start cursor-pointer mb-2" onClick={() => fetchRSS(CATEGORY_TREE[0].url, "Trang chủ")}>
+                        <h1 className="logo-main text-danger fw-bold mb-0 lh-1">GIÁO DỤC</h1>
+                        <div className="d-flex align-items-center">
+                            <span className="logo-sub text-warning fw-bold fs-4 me-1" style={{fontFamily: 'serif'}}>VÀ</span>
+                            <span className="logo-sub text-danger fw-bold fs-2">THỜI ĐẠI</span>
+                        </div>
+                    </div>
+
+                    {/* Search + Logo Phụ */}
+                    <div className="d-flex align-items-center w-50 justify-content-end mb-2 header-right-section">
+                        <Form className="w-75 me-3 position-relative d-none d-md-block">
+                            <FormControl
+                                type="search"
+                                placeholder="Tìm kiếm..."
+                                className="rounded-pill bg-light border-0 ps-3 pe-5 py-2"
+                            />
+                            <Button variant="link" className="position-absolute top-50 end-0 translate-middle-y text-dark pe-3">
+                                <i className="bi bi-search"></i>
+                            </Button>
+                        </Form>
+
+                        {/* Logo Phụ (HTML thuần) */}
+                        <div className="sub-logo-box text-end lh-1 ps-3 border-start">
+                            <div className="text-danger fw-bold fs-5">GIÁO DỤC</div>
+                            <div className="text-dark fw-bold" style={{fontSize: '0.6rem'}}>CHUYÊN TRANG CỦA</div>
+                            <div className="text-dark" style={{fontSize: '0.6rem'}}>BÁO GIÁO DỤC & THỜI ĐẠI</div>
+                            <div className="text-danger fw-bold" style={{fontSize: '0.75rem'}}>THỦ ĐÔ</div>
+                        </div>
+                    </div>
+                </Container>
+            </header>
+
+            {/* 3. NAVBAR ĐỎ (Sticky) */}
+            <Navbar bg="danger" variant="dark" expand="lg" className="py-0 sticky-top main-nav shadow-sm">
                 <Container>
-                    <Navbar.Brand>📰 GD&T Crawler App</Navbar.Brand>
-                    <Navbar.Text className="text-white">ReactJS - RSS Parser</Navbar.Text>
+                    <Navbar.Toggle aria-controls="main-navbar" />
+                    <Navbar.Collapse id="main-navbar">
+                        <Nav className="w-100 justify-content-between align-items-center">
+                            {/* Nút Home */}
+                            <Nav.Link onClick={() => fetchRSS(CATEGORY_TREE[0].url, "Trang chủ")} className="py-2 px-3 bg-danger-dark">
+                                <i className="bi bi-house-door-fill fs-5"></i>
+                            </Nav.Link>
+
+                            {/* Danh sách Menu */}
+                            {NAV_MENU_ITEMS.map((item, i) => (
+                                <Nav.Link
+                                    key={i}
+                                    className="text-white fw-bold px-2 py-3 nav-link-custom"
+                                >
+                                    {item}
+                                </Nav.Link>
+                            ))}
+                        </Nav>
+                    </Navbar.Collapse>
                 </Container>
             </Navbar>
 
-            <Container>
+            {/* 4. NỘI DUNG CHÍNH */}
+            <Container className="mt-4">
                 <Row>
-                    {/* SIDEBAR: DANH MỤC ĐỆ QUY */}
-                    <Col md={3} className="mb-4">
-                        <Card className="shadow-sm">
-                            <Card.Header className="bg-light fw-bold">Danh mục tin</Card.Header>
-                            <div className="p-2">
-                                <RecursiveCategory list={CATEGORY_TREE} onSelect={fetchRSS} />
-                            </div>
-                        </Card>
-                    </Col>
-
-                    {/* MAIN: DANH SÁCH TIN TỨC */}
-                    <Col md={9}>
-                        <div className="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
-                            <h4 className="text-primary m-0">{currentCategory}</h4>
-                            <span className="badge bg-secondary">{articles.length} tin</span>
+                    {/* Cột trái: Danh sách tin */}
+                    <Col lg={9}>
+                        <div className="section-title mb-4 border-bottom pb-2 border-danger border-2 d-flex align-items-center">
+                            <span className="badge bg-danger me-2">LIVE</span>
+                            <h5 className="fw-bold m-0 text-danger text-uppercase">{currentCatName}</h5>
                         </div>
 
                         {loading ? (
-                            <div className="text-center py-5"><Spinner animation="border" variant="primary"/></div>
+                            <div className="text-center py-5"><Spinner animation="border" variant="danger" /></div>
                         ) : (
                             <Row>
                                 {articles.map((item, idx) => (
-                                    <Col md={12} lg={6} key={idx} className="mb-4">
-                                        <Card className="h-100 shadow-sm news-card">
-                                            <Card.Body className="d-flex flex-column">
-                                                <Card.Title className="fs-6 fw-bold text-dark">
-                                                    <a href="#!" onClick={(e) => { e.preventDefault(); handleCrawlDetail(item); }} className="text-decoration-none text-dark hover-blue">
+                                    <Col md={idx === 0 ? 12 : 6} key={idx} className="mb-4">
+                                        <Card className={`news-card h-100 border-0 shadow-sm ${idx === 0 ? 'featured-card' : ''}`}>
+                                            <Card.Body className={idx === 0 ? 'd-md-flex p-0' : 'p-3'}>
+                                                {/* Ảnh đại diện cho bài Featured */}
+                                                {idx === 0 && (
+                                                    <div className="featured-img-box bg-secondary-subtle d-flex align-items-center justify-content-center text-muted">
+                                                        <i className="bi bi-card-image fs-1"></i>
+                                                    </div>
+                                                )}
+                                                <div className="p-3 d-flex flex-column">
+                                                    <Card.Title
+                                                        className={`fw-bold mb-2 hover-blue ${idx === 0 ? 'fs-3' : 'fs-6'}`}
+                                                        onClick={() => crawlArticle(item)}
+                                                    >
                                                         {item.title}
-                                                    </a>
-                                                </Card.Title>
-                                                <Card.Text className="small text-muted flex-grow-1">
-                                                    {/* Loại bỏ HTML tag trong mô tả ngắn */}
-                                                    {item.description?.replace(/<[^>]+>/g, '').substring(0, 120)}...
-                                                </Card.Text>
-                                                <div className="mt-2">
-                                                    <Button size="sm" variant="outline-primary" className="me-2 w-100"
-                                                            onClick={() => handleCrawlDetail(item)}>
-                                                        <i className="bi bi-eye-fill"></i> Xem chi tiết (Crawl)
-                                                    </Button>
+                                                    </Card.Title>
+                                                    <Card.Text className="text-muted small">
+                                                        {item.description?.replace(/<[^>]*>?/gm, '').substring(0, idx === 0 ? 250 : 100)}...
+                                                    </Card.Text>
+                                                    {idx === 0 && (
+                                                        <Button variant="outline-danger" size="sm" className="mt-auto w-25" onClick={() => crawlArticle(item)}>Đọc tiếp</Button>
+                                                    )}
                                                 </div>
                                             </Card.Body>
                                         </Card>
@@ -152,58 +217,52 @@ function App() {
                             </Row>
                         )}
                     </Col>
+
+                    {/* Cột phải: Sidebar Danh mục & Ads */}
+                    <Col lg={3}>
+                        <Card className="border-0 shadow-sm mb-4 sidebar-card">
+                            <Card.Header className="bg-danger text-white fw-bold py-2 text-uppercase">Chuyên mục</Card.Header>
+                            <Card.Body className="p-2">
+                                <RecursiveMenu items={CATEGORY_TREE} />
+                            </Card.Body>
+                        </Card>
+
+                        {/* Banner giả lập */}
+                        <div className="baoin-banner shadow-sm rounded p-4 text-center text-white fw-bold d-flex flex-column align-items-center justify-content-center cursor-pointer">
+                            <i className="bi bi-newspaper fs-1 mb-2"></i>
+                            <span>ĐỌC BÁO IN <br/> ONLINE</span>
+                        </div>
+                    </Col>
                 </Row>
             </Container>
 
-            {/* MODAL: HIỂN THỊ NỘI DUNG CRAWL ĐƯỢC */}
-            <Modal show={!!selectedArticle} onHide={() => setSelectedArticle(null)} size="lg" scrollable>
-                <Modal.Header closeButton>
-                    <Modal.Title className="fs-6">{selectedArticle?.title}</Modal.Title>
+            {/* 5. MODAL HIỂN THỊ NỘI DUNG CRAWL */}
+            <Modal show={!!selectedArticle} onHide={() => setSelectedArticle(null)} size="lg" centered scrollable>
+                <Modal.Header closeButton className="border-0 bg-light">
+                    <Modal.Title className="text-danger fw-bold fs-5">{selectedArticle?.title}</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
-                    {crawling ? (
-                        <div className="text-center py-4">
-                            <Spinner animation="grow" variant="info" />
-                            <p className="mt-2 text-muted">Đang phân tích HTML từ link gốc...</p>
+                <Modal.Body className="article-content-body px-4 py-3">
+                    {isCrawling ? (
+                        <div className="text-center py-5">
+                            <Spinner animation="grow" variant="danger" />
+                            <p className="mt-2 text-muted">Đang tải dữ liệu bài viết...</p>
                         </div>
                     ) : (
-                        <div className="article-body" dangerouslySetInnerHTML={{ __html: articleContent }} />
+                        <div dangerouslySetInnerHTML={{ __html: detailContent }} />
                     )}
                 </Modal.Body>
-                <Modal.Footer>
+                <Modal.Footer className="border-0">
                     <Button variant="secondary" onClick={() => setSelectedArticle(null)}>Đóng</Button>
-                    <Button variant="primary" href={selectedArticle?.link} target="_blank">Xem trang gốc</Button>
+                    <Button variant="danger" href={selectedArticle?.link} target="_blank">Xem trên Web gốc</Button>
                 </Modal.Footer>
             </Modal>
+
+            {/* Footer đơn giản */}
+            <footer className="bg-light text-center py-3 mt-5 border-top small text-muted">
+                &copy; 2025 Báo Giáo dục & Thời đại - React App Demo
+            </footer>
         </div>
     );
 }
-
-// COMPONENT ĐỆ QUY (Hiển thị danh mục lồng nhau)
-const RecursiveCategory = ({ list, onSelect }) => {
-    return (
-        <ul className="list-unstyled ps-2 mb-0">
-            {list.map((item) => (
-                <li key={item.id} className="mb-1">
-                    <div
-                        className="category-item p-2 rounded"
-                        onClick={(e) => {
-                            e.stopPropagation(); // Ngăn sự kiện nổi bọt
-                            if (item.url) onSelect(item.url, item.name);
-                        }}
-                    >
-                        {item.children ? '📂 ' : '📰 '} {item.name}
-                    </div>
-                    {/* Điều kiện dừng đệ quy: Nếu có children thì gọi lại chính nó */}
-                    {item.children && item.children.length > 0 && (
-                        <div className="border-start ms-3 ps-2">
-                            <RecursiveCategory list={item.children} onSelect={onSelect} />
-                        </div>
-                    )}
-                </li>
-            ))}
-        </ul>
-    );
-};
 
 export default App;
