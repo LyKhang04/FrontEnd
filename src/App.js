@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Navbar, Nav, Form, FormControl, Button, Card, Modal, Spinner } from 'react-bootstrap';
 import { XMLParser } from 'fast-xml-parser';
 import axios from 'axios';
+<<<<<<< HEAD
+import { CATEGORY_TREE } from './data'; // Import data mới
+=======
 import { CATEGORY_TREE } from './data'; // Đảm bảo bạn đã có file data.js
+>>>>>>> 002a46782ba3ed0140846af3d61f5694824a5b18
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
@@ -102,7 +106,11 @@ function App() {
 
     return (
         <div className="app-container">
+<<<<<<< HEAD
+            {/* 1. TOP INFO BAR */}
+=======
             {/* 1. TOP INFO BAR (Ngày, Hotline, Email) */}
+>>>>>>> 002a46782ba3ed0140846af3d61f5694824a5b18
             <div className="top-info-bar bg-light border-bottom py-1">
                 <Container className="d-flex justify-content-start align-items-center small text-secondary flex-wrap">
                     <span className="me-3 mb-1"><i className="bi bi-clock me-1"></i> {new Date().toLocaleDateString('vi-VN', {weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit'})}</span>
@@ -136,7 +144,11 @@ function App() {
                             </Button>
                         </Form>
 
+<<<<<<< HEAD
+                        {/* Logo Phụ */}
+=======
                         {/* Logo Phụ (HTML thuần) */}
+>>>>>>> 002a46782ba3ed0140846af3d61f5694824a5b18
                         <div className="sub-logo-box text-end lh-1 ps-3 border-start">
                             <div className="text-danger fw-bold fs-5">GIÁO DỤC</div>
                             <div className="text-dark fw-bold" style={{fontSize: '0.6rem'}}>CHUYÊN TRANG CỦA</div>
@@ -158,6 +170,16 @@ function App() {
                                 <i className="bi bi-house-door-fill fs-5"></i>
                             </Nav.Link>
 
+<<<<<<< HEAD
+                            {/* Danh sách Menu Lấy từ Data */}
+                            {CATEGORY_TREE.slice(1, 13).map((item, i) => (
+                                <Nav.Link
+                                    key={i}
+                                    className="text-white fw-bold px-2 py-3 nav-link-custom"
+                                    onClick={() => fetchRSS(item.url, item.name)}
+                                >
+                                    {item.name}
+=======
                             {/* Danh sách Menu */}
                             {NAV_MENU_ITEMS.map((item, i) => (
                                 <Nav.Link
@@ -165,6 +187,7 @@ function App() {
                                     className="text-white fw-bold px-2 py-3 nav-link-custom"
                                 >
                                     {item}
+>>>>>>> 002a46782ba3ed0140846af3d61f5694824a5b18
                                 </Nav.Link>
                             ))}
                         </Nav>
@@ -172,11 +195,19 @@ function App() {
                 </Container>
             </Navbar>
 
+<<<<<<< HEAD
+            {/* 4. NỘI DUNG CHÍNH (Đã xóa cột phải, mở rộng full width) */}
+            <Container className="mt-4">
+                <Row>
+                    {/* Cột chính mở rộng ra 12 (Full width) */}
+                    <Col lg={12}>
+=======
             {/* 4. NỘI DUNG CHÍNH */}
             <Container className="mt-4">
                 <Row>
                     {/* Cột trái: Danh sách tin */}
                     <Col lg={9}>
+>>>>>>> 002a46782ba3ed0140846af3d61f5694824a5b18
                         <div className="section-title mb-4 border-bottom pb-2 border-danger border-2 d-flex align-items-center">
                             <span className="badge bg-danger me-2">LIVE</span>
                             <h5 className="fw-bold m-0 text-danger text-uppercase">{currentCatName}</h5>
@@ -187,16 +218,29 @@ function App() {
                         ) : (
                             <Row>
                                 {articles.map((item, idx) => (
+<<<<<<< HEAD
+                                    // Điều chỉnh grid: Bài đầu to (12), các bài sau chia 3 cột (4) hoặc 2 cột (6) tùy ý
+                                    <Col md={idx === 0 ? 12 : 4} key={idx} className="mb-4">
+=======
                                     <Col md={idx === 0 ? 12 : 6} key={idx} className="mb-4">
+>>>>>>> 002a46782ba3ed0140846af3d61f5694824a5b18
                                         <Card className={`news-card h-100 border-0 shadow-sm ${idx === 0 ? 'featured-card' : ''}`}>
                                             <Card.Body className={idx === 0 ? 'd-md-flex p-0' : 'p-3'}>
                                                 {/* Ảnh đại diện cho bài Featured */}
                                                 {idx === 0 && (
+<<<<<<< HEAD
+                                                    <div className="featured-img-box bg-secondary-subtle d-flex align-items-center justify-content-center text-muted col-md-6">
+                                                        <i className="bi bi-card-image fs-1"></i>
+                                                    </div>
+                                                )}
+                                                <div className={`d-flex flex-column ${idx === 0 ? 'p-4 col-md-6' : ''}`}>
+=======
                                                     <div className="featured-img-box bg-secondary-subtle d-flex align-items-center justify-content-center text-muted">
                                                         <i className="bi bi-card-image fs-1"></i>
                                                     </div>
                                                 )}
                                                 <div className="p-3 d-flex flex-column">
+>>>>>>> 002a46782ba3ed0140846af3d61f5694824a5b18
                                                     <Card.Title
                                                         className={`fw-bold mb-2 hover-blue ${idx === 0 ? 'fs-3' : 'fs-6'}`}
                                                         onClick={() => crawlArticle(item)}
@@ -218,6 +262,9 @@ function App() {
                         )}
                     </Col>
 
+<<<<<<< HEAD
+                    {/* ĐÃ XÓA CỘT BÊN PHẢI (SIDEBAR & BANNER) */}
+=======
                     {/* Cột phải: Sidebar Danh mục & Ads */}
                     <Col lg={3}>
                         <Card className="border-0 shadow-sm mb-4 sidebar-card">
@@ -233,6 +280,7 @@ function App() {
                             <span>ĐỌC BÁO IN <br/> ONLINE</span>
                         </div>
                     </Col>
+>>>>>>> 002a46782ba3ed0140846af3d61f5694824a5b18
                 </Row>
             </Container>
 
@@ -257,7 +305,11 @@ function App() {
                 </Modal.Footer>
             </Modal>
 
+<<<<<<< HEAD
+            {/* Footer */}
+=======
             {/* Footer đơn giản */}
+>>>>>>> 002a46782ba3ed0140846af3d61f5694824a5b18
             <footer className="bg-light text-center py-3 mt-5 border-top small text-muted">
                 &copy; 2025 Báo Giáo dục & Thời đại - React App Demo
             </footer>
