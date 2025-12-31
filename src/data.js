@@ -9,7 +9,6 @@ export const CATEGORY_TREE = [
         name: "Giáo dục",
         url: "https://giaoducthoidai.vn/rss/giao-duc-2.rss",
         children: [
-            // Cập nhật đúng theo ảnh bạn gửi
             { id: 21, name: "Chính sách", url: "https://giaoducthoidai.vn/rss/chinh-sach-quan-ly-12.rss" },
             { id: 22, name: "Địa phương", url: "https://giaoducthoidai.vn/rss/dia-phuong-13.rss" },
             { id: 23, name: "Đào tạo - Tuyển sinh", url: "https://giaoducthoidai.vn/rss/tuyen-sinh-du-hoc-16.rss" },
@@ -28,8 +27,15 @@ export const CATEGORY_TREE = [
     },
     {
         id: 4,
-        name: "Giáo dục pháp luật", // Sửa tên cho khớp ảnh
-        url: "https://giaoducthoidai.vn/rss/phap-luat-5.rss"
+        name: "Giáo dục pháp luật",
+        url: "https://giaoducthoidai.vn/rss/phap-luat-5.rss",
+        // --- BỔ SUNG PHẦN NÀY ---
+        children: [
+            { id: 41, name: "An ninh", url: "https://giaoducthoidai.vn/rss/an-ninh-32.rss" },
+            { id: 42, name: "Pháp đình", url: "https://giaoducthoidai.vn/rss/phap-dinh-33.rss" },
+            { id: 43, name: "Bạn đọc - Điều tra", url: "https://giaoducthoidai.vn/rss/ban-doc-dieu-tra-34.rss" }
+        ]
+        // ------------------------
     },
     {
         id: 5,
@@ -43,7 +49,7 @@ export const CATEGORY_TREE = [
     },
     {
         id: 7,
-        name: "Học đường", // Thêm mục này cho khớp ảnh
+        name: "Học đường",
         url: "https://giaoducthoidai.vn/rss/hoc-duong-14.rss"
     },
     {
@@ -63,7 +69,7 @@ export const CATEGORY_TREE = [
     },
     {
         id: 11,
-        name: "Media", // Thêm mục Media
+        name: "Media",
         url: "https://giaoducthoidai.vn/rss/video-media-11.rss"
     },
     {
