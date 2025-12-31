@@ -29,19 +29,25 @@ export const CATEGORY_TREE = [
         id: 4,
         name: "Giáo dục pháp luật",
         url: "https://giaoducthoidai.vn/rss/phap-luat-5.rss",
-        // --- BỔ SUNG PHẦN NÀY ---
         children: [
             { id: 41, name: "An ninh", url: "https://giaoducthoidai.vn/rss/an-ninh-32.rss" },
             { id: 42, name: "Pháp đình", url: "https://giaoducthoidai.vn/rss/phap-dinh-33.rss" },
             { id: 43, name: "Bạn đọc - Điều tra", url: "https://giaoducthoidai.vn/rss/ban-doc-dieu-tra-34.rss" }
         ]
-        // ------------------------
     },
+    // --- CẬP NHẬT PHẦN KẾT NỐI ---
     {
         id: 5,
         name: "Kết nối",
-        url: "https://giaoducthoidai.vn/rss/ket-noi-20.rss"
+        url: "https://giaoducthoidai.vn/rss/ket-noi-20.rss",
+        children: [
+            { id: 51, name: "Công đoàn", url: "https://giaoducthoidai.vn/rss/cong-doan-35.rss" },
+            { id: 52, name: "Sáng tác", url: "https://giaoducthoidai.vn/rss/sang-tac-36.rss" },
+            { id: 53, name: "Đồng hành", url: "https://giaoducthoidai.vn/rss/dong-hanh-37.rss" },
+            { id: 54, name: "Khoa học - Công nghệ", url: "https://giaoducthoidai.vn/rss/khoa-hoc-cong-nghe-38.rss" }
+        ]
     },
+    // -----------------------------
     {
         id: 6,
         name: "Trao đổi",
