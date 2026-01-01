@@ -46,7 +46,6 @@ export const CATEGORY_TREE = [
             { id: 54, name: "Khoa học - Công nghệ", url: "https://giaoducthoidai.vn/rss/khoa-hoc-cong-nghe-38.rss" }
         ]
     },
-    // --- CẬP NHẬT PHẦN TRAO ĐỔI ---
     {
         id: 6,
         name: "Trao đổi",
@@ -56,12 +55,18 @@ export const CATEGORY_TREE = [
             { id: 62, name: "Góc chuyên gia", url: "https://giaoducthoidai.vn/rss/goc-chuyen-gia-40.rss" }
         ]
     },
-    // -----------------------------
+    // --- CẬP NHẬT PHẦN HỌC ĐƯỜNG ---
     {
         id: 7,
         name: "Học đường",
-        url: "https://giaoducthoidai.vn/rss/hoc-duong-14.rss"
+        url: "https://giaoducthoidai.vn/rss/hoc-duong-14.rss",
+        children: [
+            { id: 71, name: "Kỹ năng", url: "https://giaoducthoidai.vn/rss/ky-nang-26.rss" },
+            { id: 72, name: "Du học", url: "https://giaoducthoidai.vn/rss/du-hoc-28.rss" },
+            { id: 73, name: "Thể chất", url: "https://giaoducthoidai.vn/rss/the-chat-27.rss" }
+        ]
     },
+    // --------------------------------
     {
         id: 8,
         name: "Nhân ái",
