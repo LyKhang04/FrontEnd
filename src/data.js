@@ -46,7 +46,6 @@ export const CATEGORY_TREE = [
             { id: 54, name: "Khoa học - Công nghệ", url: "https://giaoducthoidai.vn/rss/khoa-hoc-cong-nghe-38.rss" }
         ]
     },
-    // --- CẬP NHẬT PHẦN TRAO ĐỔI ---
     {
         id: 6,
         name: "Trao đổi",
@@ -56,29 +55,40 @@ export const CATEGORY_TREE = [
             { id: 62, name: "Góc chuyên gia", url: "https://giaoducthoidai.vn/rss/goc-chuyen-gia-40.rss" }
         ]
     },
-    // -----------------------------
     {
         id: 7,
         name: "Học đường",
-        url: "https://giaoducthoidai.vn/rss/hoc-duong-14.rss"
+        url: "https://giaoducthoidai.vn/rss/hoc-duong-14.rss",
+        children: [
+            { id: 71, name: "Kỹ năng", url: "https://giaoducthoidai.vn/rss/ky-nang-26.rss" },
+            { id: 72, name: "Du học", url: "https://giaoducthoidai.vn/rss/du-hoc-28.rss" },
+            { id: 73, name: "Thể chất", url: "https://giaoducthoidai.vn/rss/the-chat-27.rss" }
+        ]
     },
     {
         id: 8,
         name: "Nhân ái",
         url: "https://giaoducthoidai.vn/rss/nhan-ai-23.rss"
     },
+    // --- CẬP NHẬT PHẦN THẾ GIỚI ---
     {
         id: 9,
         name: "Thế giới",
-        url: "https://giaoducthoidai.vn/rss/the-gioi-10.rss"
+        url: "https://giaoducthoidai.vn/rss/the-gioi-10.rss",
+        children: [
+            { id: 91, name: "Giáo dục Quốc phòng", url: "https://giaoducthoidai.vn/rss/giao-duc-quoc-phong-29.rss" },
+            { id: 92, name: "Thế giới đó đây", url: "https://giaoducthoidai.vn/rss/the-gioi-do-day-30.rss" },
+            { id: 93, name: "Chuyện lạ", url: "https://giaoducthoidai.vn/rss/chuyen-la-44.rss" }
+        ]
     },
+    // -------------------------------
     {
         id: 10,
         name: "Sức khoẻ",
         url: "https://giaoducthoidai.vn/rss/suc-khoe-19.rss",
         children: [
-            { id: 91, name: "Y học", url: "https://giaoducthoidai.vn/rss/y-hoc-20.rss" },
-            { id: 92, name: "Dinh dưỡng", url: "https://giaoducthoidai.vn/rss/dinh-duong-21.rss" }
+            { id: 101, name: "Y học", url: "https://giaoducthoidai.vn/rss/y-hoc-20.rss" },
+            { id: 102, name: "Dinh dưỡng", url: "https://giaoducthoidai.vn/rss/dinh-duong-21.rss" }
         ]
     },
     {
