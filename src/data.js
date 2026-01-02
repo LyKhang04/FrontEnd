@@ -80,7 +80,6 @@ export const CATEGORY_TREE = [
             { id: 93, name: "Chuyện lạ", url: "https://giaoducthoidai.vn/rss/chuyen-la-44.rss" }
         ]
     },
-    // --- CẬP NHẬT PHẦN SỨC KHOẺ ---
     {
         id: 10,
         name: "Sức khoẻ",
@@ -88,15 +87,22 @@ export const CATEGORY_TREE = [
         children: [
             { id: 101, name: "Khoẻ đẹp", url: "https://giaoducthoidai.vn/rss/y-hoc-20.rss" },
             { id: 102, name: "Gia đình", url: "https://giaoducthoidai.vn/rss/dinh-duong-21.rss" },
-            { id: 103, name: "Đẩy lùi Covid-19", url: "https://giaoducthoidai.vn/rss/suc-khoe-19.rss" } // URL dự phòng
+            { id: 103, name: "Đẩy lùi Covid-19", url: "https://giaoducthoidai.vn/rss/suc-khoe-19.rss" }
         ]
     },
-    // ------------------------------
+    // --- CẬP NHẬT PHẦN MEDIA ---
     {
         id: 11,
         name: "Media",
-        url: "https://giaoducthoidai.vn/rss/video-media-11.rss"
+        url: "https://giaoducthoidai.vn/rss/video-media-11.rss",
+        children: [
+            { id: 111, name: "Infographic", url: "https://giaoducthoidai.vn/rss/infographic-46.rss" },
+            { id: 112, name: "Video", url: "https://giaoducthoidai.vn/rss/video-45.rss" },
+            { id: 113, name: "Nóng 247", url: "https://giaoducthoidai.vn/rss/video-media-11.rss" },
+            { id: 114, name: "Tiêu điểm", url: "https://giaoducthoidai.vn/rss/tieu-diem-48.rss" }
+        ]
     },
+    // ---------------------------
     {
         id: 12,
         name: "Văn hóa",
