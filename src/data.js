@@ -80,7 +80,6 @@ export const CATEGORY_TREE = [
             { id: 93, name: "Chuyện lạ", url: "https://giaoducthoidai.vn/rss/chuyen-la-44.rss" }
         ]
     },
-    // --- CẬP NHẬT PHẦN SỨC KHOẺ ---
     {
         id: 10,
         name: "Sức khoẻ",
@@ -88,23 +87,38 @@ export const CATEGORY_TREE = [
         children: [
             { id: 101, name: "Khoẻ đẹp", url: "https://giaoducthoidai.vn/rss/y-hoc-20.rss" },
             { id: 102, name: "Gia đình", url: "https://giaoducthoidai.vn/rss/dinh-duong-21.rss" },
-            { id: 103, name: "Đẩy lùi Covid-19", url: "https://giaoducthoidai.vn/rss/suc-khoe-19.rss" } // URL dự phòng
+            { id: 103, name: "Đẩy lùi Covid-19", url: "https://giaoducthoidai.vn/rss/suc-khoe-19.rss" }
         ]
     },
-    // ------------------------------
     {
         id: 11,
         name: "Media",
-        url: "https://giaoducthoidai.vn/rss/video-media-11.rss"
+        url: "https://giaoducthoidai.vn/rss/video-media-11.rss",
+        children: [
+            { id: 111, name: "Infographic", url: "https://giaoducthoidai.vn/rss/infographic-46.rss" },
+            { id: 112, name: "Video", url: "https://giaoducthoidai.vn/rss/video-45.rss" },
+            { id: 113, name: "Nóng 247", url: "https://giaoducthoidai.vn/rss/video-media-11.rss" },
+            { id: 114, name: "Tiêu điểm", url: "https://giaoducthoidai.vn/rss/tieu-diem-48.rss" }
+        ]
     },
     {
         id: 12,
         name: "Văn hóa",
-        url: "https://giaoducthoidai.vn/rss/van-hoa-8.rss"
+        url: "https://giaoducthoidai.vn/rss/van-hoa-8.rss",
+        children: [
+            { id: 121, name: "Sáng tác", url: "https://giaoducthoidai.vn/rss/sang-tac-36.rss" },
+            { id: 122, name: "Đời sống văn hoá", url: "https://giaoducthoidai.vn/rss/doi-song-van-hoa-47.rss" },
+            { id: 123, name: "Sao", url: "https://giaoducthoidai.vn/rss/the-gioi-sao-49.rss" }
+        ]
     },
+
     {
         id: 13,
         name: "Thể thao",
-        url: "https://giaoducthoidai.vn/rss/the-thao-12.rss"
+        url: "https://giaoducthoidai.vn/rss/the-thao-12.rss",
+        children: [
+            { id: 131, name: "Thể thao học đường", url: "https://giaoducthoidai.vn/rss/the-thao-hoc-duong-25.rss" }
+        ]
     }
+
 ];

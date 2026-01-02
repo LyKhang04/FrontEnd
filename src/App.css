@@ -1,4 +1,4 @@
-/* --- STYLE CHO DROPDOWN MENU --- */
+
 .custom-dropdown .dropdown-toggle {
     color: white !important;
     font-weight: 700;
@@ -27,6 +27,6 @@
 }
 
 .custom-dropdown .dropdown-item:hover {
-    background-color: #fce8e8; /* Màu hồng nhạt khi hover item con */
-    color: #c92127; /* Chữ đỏ */
+    background-color: #fce8e8;
+    color: #c92127;
 }
