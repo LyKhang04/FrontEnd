@@ -90,7 +90,6 @@ export const CATEGORY_TREE = [
             { id: 103, name: "Đẩy lùi Covid-19", url: "https://giaoducthoidai.vn/rss/suc-khoe-19.rss" }
         ]
     },
-    // --- CẬP NHẬT PHẦN MEDIA ---
     {
         id: 11,
         name: "Media",
@@ -102,12 +101,18 @@ export const CATEGORY_TREE = [
             { id: 114, name: "Tiêu điểm", url: "https://giaoducthoidai.vn/rss/tieu-diem-48.rss" }
         ]
     },
-    // ---------------------------
+    // --- CẬP NHẬT PHẦN VĂN HÓA ---
     {
         id: 12,
         name: "Văn hóa",
-        url: "https://giaoducthoidai.vn/rss/van-hoa-8.rss"
+        url: "https://giaoducthoidai.vn/rss/van-hoa-8.rss",
+        children: [
+            { id: 121, name: "Sáng tác", url: "https://giaoducthoidai.vn/rss/sang-tac-36.rss" },
+            { id: 122, name: "Đời sống văn hoá", url: "https://giaoducthoidai.vn/rss/doi-song-van-hoa-47.rss" },
+            { id: 123, name: "Sao", url: "https://giaoducthoidai.vn/rss/the-gioi-sao-49.rss" }
+        ]
     },
+    // -----------------------------
     {
         id: 13,
         name: "Thể thao",
