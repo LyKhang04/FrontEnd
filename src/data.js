@@ -38,7 +38,7 @@ export const CATEGORY_TREE = [
     {
         id: 5,
         name: "Kết nối",
-        url: "https://giaoducthoidai.vn/rss/ket-noi-20.rss",
+        url: "https://giaoducthoidai.vn/rss/dong-hanh-37.rss",
         children: [
             { id: 51, name: "Công đoàn", url: "https://giaoducthoidai.vn/rss/cong-doan-35.rss" },
             { id: 52, name: "Sáng tác", url: "https://giaoducthoidai.vn/rss/sang-tac-36.rss" },
