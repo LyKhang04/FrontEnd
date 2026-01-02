@@ -1,54 +1,34 @@
-/* Layout mở rộng và Category Blocks */
-.news-section-block .section-header-title {
-    font-size: 1.1rem;
+/* Style cho Toàn cảnh - Sự kiện */
+.toan-canh-title h4 {
+    border-bottom: 2px solid #dc3545;
+    padding-bottom: 5px;
+    display: inline-block;
+}
+
+/* Sidebar Styles */
+.sidebar-header {
+    font-size: 0.9rem;
     letter-spacing: 0.5px;
 }
 
-.main-block-card .card-title {
-    font-size: 1.4rem;
-    line-height: 1.3;
+.sidebar-content {
+    max-height: 500px;
+    overflow-y: auto;
 }
 
-/* Hiệu ứng cắt dòng cho danh sách tin phụ */
-.line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-/* Sidebar cập nhật mới */
-.sidebar-news-list {
-    background-color: #fff;
-}
-
-/* Footer Site Styling */
-.footer-site h6 {
-    letter-spacing: 1px;
-}
-
-.footer-site .bi {
+/* Banner Báo in */
+.baoin-banner {
+    background: linear-gradient(135deg, #c92127 0%, #ff5252 100%);
     transition: transform 0.2s;
 }
-
-.footer-site .bi:hover {
-    transform: scale(1.2);
-    color: #ffd700;
+.baoin-banner:hover {
+    transform: scale(1.02);
 }
 
-/* Tối ưu hóa ảnh tràn khung */
-.object-fit-cover {
-    object-fit: cover;
-    width: 100%;
-    height: 100%;
-}
-
-.ratio-1x1 {
-    min-width: 80px;
-}
-
-/* Banner quảng cáo */
-.banner-top img {
-    max-height: 120px;
-    object-fit: cover;
+/* Line clamp 3 dòng */
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
