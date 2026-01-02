@@ -1,32 +1,38 @@
-
-.custom-dropdown .dropdown-toggle {
-    color: white !important;
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
+/* Tùy chỉnh Category Blocks */
+.category-block .category-title {
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
 }
 
-.custom-dropdown .dropdown-toggle:hover {
-    background-color: rgba(255, 255, 255, 0.2);
+.category-block i {
+    font-size: 0.8rem;
 }
 
-.custom-dropdown .dropdown-menu {
-    border-radius: 0;
-    border: none;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    margin-top: 0;
+/* Footer Styles */
+.footer {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.custom-dropdown .dropdown-item {
-    font-size: 0.9rem;
-    padding: 10px 20px;
-    font-weight: 500;
-    transition: all 0.2s;
+.footer h5 {
+    letter-spacing: 1px;
 }
 
-.custom-dropdown .dropdown-item:hover {
-    background-color: #fce8e8;
-    color: #c92127;
+.footer .bi {
+    color: #ffd700; /* Màu vàng nhẹ cho icon trong footer */
+}
+
+/* Responsive Object Fit */
+.object-fit-cover {
+    object-fit: cover;
+}
+
+/* Featured Card Image */
+.featured-img-box {
+    min-height: 350px;
+}
+
+@media (max-width: 768px) {
+    .featured-img-box {
+        min-height: 200px;
+    }
 }
