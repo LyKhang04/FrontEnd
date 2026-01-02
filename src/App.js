@@ -7,6 +7,15 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
 
+// Danh sách các danh mục sẽ hiển thị khối tin ở trang chủ
+const HOME_BLOCKS = [
+    { name: "Giáo dục", url: "https://giaoducthoidai.vn/rss/giao-duc-2.rss" },
+    { name: "Thời sự", url: "https://giaoducthoidai.vn/rss/thoi-su-1.rss" },
+    { name: "Giáo dục pháp luật", url: "https://giaoducthoidai.vn/rss/phap-luat-5.rss" },
+    { name: "Kết nối", url: "https://giaoducthoidai.vn/rss/ket-noi-20.rss" },
+    { name: "Văn hóa", url: "https://giaoducthoidai.vn/rss/van-hoa-8.rss" }
+];
+
 function App() {
     const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -85,22 +94,42 @@ function App() {
         if (CATEGORY_TREE.length > 0) fetchRSS(CATEGORY_TREE[0].url, CATEGORY_TREE[0].name);
     }, []);
 
-    // Helper component hiển thị khối danh mục nhỏ (vd: Giáo dục, Thời sự...)
-    const CategoryBlock = ({ category }) => (
-        <div className="category-block mt-5">
+    // Component hiển thị một khối danh mục tin tức
+    const NewsSection = ({ title, data, onTitleClick }) => (
+        <div className="news-section-block mb-5">
             <div className="d-flex justify-content-between align-items-center border-bottom border-danger border-2 mb-3">
-                <h4 className="bg-danger text-white px-3 py-1 mb-0 text-uppercase fw-bold" style={{ fontSize: '1rem' }}>
-                    {category.name}
+                <h4 className="section-header-title text-danger fw-bold mb-0 text-uppercase py-1 cursor-pointer" onClick={onTitleClick}>
+                    {title}
                 </h4>
-                <Nav.Link onClick={() => fetchRSS(category.url, category.name)} className="text-danger small fw-bold">
-                    XEM THÊM <i className="bi bi-chevron-double-right"></i>
-                </Nav.Link>
+                <Nav.Link className="text-muted small p-0" onClick={onTitleClick}>Xem thêm <i className="bi bi-chevron-double-right"></i></Nav.Link>
             </div>
-            {/* Logic này yêu cầu fetch RSS riêng cho từng block nếu muốn chính xác,
-                để đơn giản ta sẽ lấy dữ liệu từ mảng articles hiện tại nếu trùng tên */}
             <Row>
-                <Col md={12}>
-                    <p className="text-muted small">Dữ liệu cho phần này sẽ tự động cập nhật khi bạn chọn danh mục tương ứng trên Menu.</p>
+                <Col md={7}>
+                    {data[0] && (
+                        <Card className="border-0 shadow-sm h-100 main-block-card" onClick={() => crawlArticle(data[0])}>
+                            <div className="ratio ratio-16x9 bg-light overflow-hidden rounded">
+                                {data[0].imageUrl ? <img src={data[0].imageUrl} className="object-fit-cover" alt="" /> : <div className="d-flex align-items-center justify-content-center h-100"><i className="bi bi-image fs-1 text-muted"></i></div>}
+                            </div>
+                            <Card.Body className="px-0">
+                                <Card.Title className="fw-bold fs-4 hover-blue">{data[0].title}</Card.Title>
+                                <Card.Text className="text-muted small">{data[0].cleanDesc}</Card.Text>
+                            </Card.Body>
+                        </Card>
+                    )}
+                </Col>
+                <Col md={5}>
+                    <div className="sub-news-list">
+                        {data.slice(1, 5).map((item, idx) => (
+                            <div key={idx} className="d-flex mb-3 pb-3 border-bottom align-items-start cursor-pointer" onClick={() => crawlArticle(item)}>
+                                <div className="flex-shrink-0 ratio ratio-1x1 bg-light rounded overflow-hidden me-3" style={{ width: '80px' }}>
+                                    {item.imageUrl ? <img src={item.imageUrl} className="object-fit-cover" alt="" /> : <i className="bi bi-image m-auto text-muted"></i>}
+                                </div>
+                                <div className="flex-grow-1">
+                                    <h6 className="fw-bold mb-1 small hover-blue line-clamp-2">{item.title}</h6>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </Col>
             </Row>
         </div>
@@ -108,31 +137,29 @@ function App() {
 
     return (
         <div className="app-container">
-            {/* 1. Top Bar */}
+            {/* Header và Navbar giữ nguyên như các bước trước */}
             <div className="top-info-bar bg-light border-bottom py-1">
                 <Container className="d-flex justify-content-start align-items-center small text-secondary">
                     <span className="me-3"><i className="bi bi-clock me-1"></i> {new Date().toLocaleDateString('vi-VN')}</span>
                     <span className="me-3 border-start ps-3">Hotline: <strong className="text-danger">096.733.5089</strong></span>
-                    <span className="border-start ps-3">Email: <span className="text-primary">gdtddientu@gmail.com</span></span>
+                    <span className="border-start ps-3">Email: gdtddientu@gmail.com</span>
                 </Container>
             </div>
 
-            {/* 2. Header */}
             <header className="bg-white py-3">
-                <Container className="d-flex justify-content-between align-items-end flex-wrap">
-                    <div className="logo-box cursor-pointer mb-2" onClick={() => fetchRSS(CATEGORY_TREE[0].url, "Trang chủ")}>
+                <Container className="d-flex justify-content-between align-items-center flex-wrap">
+                    <div className="logo-box cursor-pointer" onClick={() => fetchRSS(CATEGORY_TREE[0].url, "Trang chủ")}>
                         <h1 className="logo-main text-danger fw-bold mb-0 lh-1">GIÁO DỤC</h1>
                         <div className="d-flex align-items-center">
                             <span className="logo-sub text-warning fw-bold fs-4 me-1">VÀ</span>
                             <span className="logo-sub text-danger fw-bold fs-2">THỜI ĐẠI</span>
                         </div>
                     </div>
-                    <div className="d-flex align-items-center w-50 justify-content-end mb-2">
-                        <Form className="w-75 me-3 position-relative d-none d-md-block">
-                            <FormControl type="search" placeholder="Tìm kiếm..." className="rounded-pill bg-light border-0 ps-3 pe-5 py-2" />
-                            <Button variant="link" className="position-absolute top-50 end-0 translate-middle-y text-dark pe-3"><i className="bi bi-search"></i></Button>
+                    <div className="d-flex align-items-center header-right">
+                        <Form className="d-none d-md-flex me-3">
+                            <FormControl type="search" placeholder="Tìm kiếm..." className="rounded-pill bg-light border-0 px-4 py-2" />
                         </Form>
-                        <div className="sub-logo-box text-end lh-1 ps-3 border-start">
+                        <div className="sub-logo-box text-end lh-1 border-start ps-3">
                             <div className="text-danger fw-bold fs-5">GIÁO DỤC</div>
                             <div className="text-dark fw-bold small">THỦ ĐÔ</div>
                         </div>
@@ -140,15 +167,12 @@ function App() {
                 </Container>
             </header>
 
-            {/* 3. Navigation Bar */}
             <Navbar bg="danger" variant="dark" expand="lg" className="py-0 sticky-top main-nav shadow-sm">
                 <Container>
                     <Navbar.Toggle aria-controls="main-navbar" />
                     <Navbar.Collapse id="main-navbar">
-                        <Nav className="w-100 justify-content-between align-items-center">
-                            <Nav.Link onClick={() => fetchRSS(CATEGORY_TREE[0].url, "Trang chủ")} className="py-2 px-3 bg-danger-dark">
-                                <i className="bi bi-house-door-fill fs-5"></i>
-                            </Nav.Link>
+                        <Nav className="w-100 justify-content-between">
+                            <Nav.Link onClick={() => fetchRSS(CATEGORY_TREE[0].url, "Trang chủ")} className="py-2 px-3 bg-danger-dark"><i className="bi bi-house-door-fill fs-5"></i></Nav.Link>
                             {CATEGORY_TREE.slice(1, 14).map((item, i) => (
                                 item.children ? (
                                     <NavDropdown key={i} title={item.name} id={`nav-${i}`} className="custom-dropdown text-white fw-bold text-uppercase">
@@ -167,83 +191,99 @@ function App() {
                 </Container>
             </Navbar>
 
-            {/* 4. Main Content */}
+            {/* Main Content Layout */}
             <Container className="mt-4">
                 <Row>
                     <Col lg={12}>
-                        <div className="section-title mb-4 border-bottom pb-2 border-danger border-2">
-                            <span className="badge bg-danger me-2">LIVE</span>
-                            <h5 className="fw-bold d-inline-block text-danger text-uppercase mb-0">{currentCatName}</h5>
-                        </div>
-
                         {loading ? <div className="text-center py-5"><Spinner animation="border" variant="danger" /></div> : (
                             <>
-                                <Row>
-                                    {articles.slice(0, 7).map((item, idx) => (
-                                        <Col md={idx === 0 ? 12 : 4} key={idx} className="mb-4">
-                                            <Card className={`news-card h-100 border-0 shadow-sm ${idx === 0 ? 'featured-card' : ''}`}>
-                                                <Card.Body className={idx === 0 ? 'd-md-flex p-0' : 'p-3'}>
-                                                    {idx === 0 && (
-                                                        <div className="featured-img-box col-md-7 bg-light overflow-hidden">
-                                                            {item.imageUrl ? <img src={item.imageUrl} className="w-100 h-100 object-fit-cover" alt="" /> : <div className="p-5 text-center"><i className="bi bi-card-image fs-1 text-muted"></i></div>}
-                                                        </div>
-                                                    )}
-                                                    <div className={`d-flex flex-column ${idx === 0 ? 'p-4 col-md-5' : ''}`}>
-                                                        <Card.Title className={`fw-bold mb-2 hover-blue ${idx === 0 ? 'fs-3' : 'fs-6'}`} onClick={() => crawlArticle(item)}>{item.title}</Card.Title>
-                                                        <Card.Text className="text-muted small">{item.cleanDesc}</Card.Text>
-                                                        {idx === 0 && <Button variant="outline-danger" size="sm" className="mt-auto w-25" onClick={() => crawlArticle(item)}>Đọc tiếp</Button>}
-                                                    </div>
+                                {/* Banner quảng cáo như trong hình */}
+                                <div className="banner-top mb-4 rounded overflow-hidden shadow-sm">
+                                    <img src="https://giaoducthoidai.vn/images/banner_default.jpg" className="w-100" alt="Ads" />
+                                </div>
+
+                                <div className="section-title mb-4 border-bottom pb-2 border-danger border-2">
+                                    <h5 className="fw-bold text-danger text-uppercase mb-0"><i className="bi bi-broadcast me-2"></i>{currentCatName}</h5>
+                                </div>
+
+                                {/* Khu vực hiển thị tin tức chính */}
+                                <Row className="mb-5">
+                                    {articles.slice(0, 1).map((item, idx) => (
+                                        <Col key={idx} md={idx === 0 ? 8 : 4} className="mb-4">
+                                            <Card className="border-0 shadow-sm h-100 news-card" onClick={() => crawlArticle(item)}>
+                                                <div className="ratio ratio-16x9 bg-light overflow-hidden rounded-top">
+                                                    {item.imageUrl ? <img src={item.imageUrl} className="object-fit-cover" alt="" /> : <div className="d-flex align-items-center justify-content-center h-100"><i className="bi bi-image fs-1 text-muted"></i></div>}
+                                                </div>
+                                                <Card.Body>
+                                                    <Card.Title className="fw-bold fs-3 hover-blue">{item.title}</Card.Title>
+                                                    <Card.Text className="text-muted small">{item.cleanDesc}</Card.Text>
                                                 </Card.Body>
                                             </Card>
                                         </Col>
                                     ))}
+                                    <Col md={4}>
+                                        <div className="sidebar-news-list bg-white p-3 rounded shadow-sm border-top border-danger border-3">
+                                            <h5 className="fw-bold text-uppercase border-bottom pb-2 mb-3 small"><i className="bi bi-star-fill text-warning me-2"></i>Tin mới cập nhật</h5>
+                                            {articles.slice(1, 6).map((item, idx) => (
+                                                <div key={idx} className="mb-3 pb-3 border-bottom cursor-pointer" onClick={() => crawlArticle(item)}>
+                                                    <h6 className="fw-bold small hover-blue mb-1">{item.title}</h6>
+                                                    <span className="text-muted" style={{ fontSize: '0.7rem' }}>Vừa xong</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </Col>
                                 </Row>
 
-                                {/* Bổ sung các khối chuyên mục nhỏ (Category Blocks) khi ở Trang chủ */}
-                                {currentCatName === "Trang chủ" && (
-                                    <>
-                                        <CategoryBlock category={CATEGORY_TREE[1]} /> {/* Giáo dục */}
-                                        <CategoryBlock category={CATEGORY_TREE[2]} /> {/* Thời sự */}
-                                        <CategoryBlock category={CATEGORY_TREE[3]} /> {/* Pháp luật */}
-                                    </>
-                                )}
+                                {/* Hiển thị đầy đủ các khối danh mục khi ở trang chủ */}
+                                {currentCatName === "Trang chủ" && HOME_BLOCKS.map((block, idx) => (
+                                    <NewsSection
+                                        key={idx}
+                                        title={block.name}
+                                        data={articles.slice(idx * 3 + 6, idx * 3 + 12)}
+                                        onTitleClick={() => fetchRSS(block.url, block.name)}
+                                    />
+                                ))}
                             </>
                         )}
                     </Col>
                 </Row>
             </Container>
 
-            {/* 5. Footer (Đã bổ sung đầy đủ) */}
-            <footer className="footer mt-5 pt-5 pb-4 text-white" style={{ backgroundColor: '#c92127' }}>
+            {/* 6. Footer Chi Tiết */}
+            <footer className="footer-site mt-5 pt-5 pb-3 text-white" style={{ backgroundColor: '#c92127' }}>
                 <Container>
-                    <Row>
-                        <Col md={4} className="mb-4 text-center text-md-start">
-                            <div className="footer-logo bg-white p-2 d-inline-block rounded mb-3">
-                                <h2 className="text-danger fw-bold mb-0" style={{ fontSize: '1.5rem' }}>GIÁO DỤC <span className="text-dark d-block" style={{ fontSize: '0.8rem' }}>VÀ THỜI ĐẠI</span></h2>
+                    <Row className="mb-4">
+                        <Col md={5} className="mb-4">
+                            <div className="footer-logo-box bg-white p-2 d-inline-block rounded mb-3">
+                                <h3 className="text-danger fw-bold mb-0 lh-1">GIÁO DỤC <span className="text-dark d-block" style={{ fontSize: '0.7rem' }}>VÀ THỜI ĐẠI</span></h3>
                             </div>
-                            <p className="small lh-base">Cơ quan của Bộ Giáo dục và Đào tạo - Diễn đàn toàn xã hội vì sự nghiệp giáo dục.</p>
+                            <p className="small mb-2 fw-bold text-uppercase">Cơ quan của bộ giáo dục và đào tạo - Diễn đàn toàn xã hội vì sự nghiệp giáo dục</p>
+                            <p className="small opacity-75">Giấy phép số 479/GP-BTTTT cấp ngày 29/10/2020. ISSN 1859-2945</p>
+                            <p className="small opacity-75">Tổng biên tập: <strong>Triệu Ngọc Lâm</strong></p>
                         </Col>
                         <Col md={4} className="mb-4">
-                            <h5 className="fw-bold text-uppercase border-bottom border-white pb-2 mb-3" style={{ fontSize: '0.9rem' }}>Trụ sở chính</h5>
-                            <ul className="list-unstyled small lh-lg">
-                                <li><i className="bi bi-geo-alt-fill me-2"></i> 15 Hai Bà Trưng, Hoàn Kiếm, Hà Nội</li>
-                                <li><i className="bi bi-telephone-fill me-2"></i> 024.3936.9800</li>
-                                <li><i className="bi bi-envelope-fill me-2"></i> gdtddientu@gmail.com</li>
+                            <h6 className="fw-bold text-uppercase border-bottom border-white border-opacity-25 pb-2 mb-3">Thông tin liên hệ</h6>
+                            <ul className="list-unstyled small opacity-75 lh-lg">
+                                <li><i className="bi bi-geo-alt-fill me-2"></i> Trụ sở chính: 15 Hai Bà Trưng, Hoàn Kiếm, Hà Nội</li>
+                                <li><i className="bi bi-telephone-fill me-2"></i> Điện thoại: 024.3936 9800</li>
+                                <li><i className="bi bi-envelope-fill me-2"></i> Email: gdtddientu@gmail.com</li>
                             </ul>
                         </Col>
-                        <Col md={4} className="mb-4">
-                            <h5 className="fw-bold text-uppercase border-bottom border-white pb-2 mb-3" style={{ fontSize: '0.9rem' }}>Liên hệ quảng cáo</h5>
-                            <p className="small mb-1">Phòng Truyền thông và Dự án</p>
-                            <p className="fw-bold"><i className="bi bi-phone-fill me-2"></i> 0886.059.988</p>
+                        <Col md={3} className="mb-4 text-center text-md-start">
+                            <h6 className="fw-bold text-uppercase border-bottom border-white border-opacity-25 pb-2 mb-3">Theo dõi chúng tôi</h6>
+                            <div className="d-flex justify-content-center justify-content-md-start gap-3 fs-4">
+                                <i className="bi bi-facebook cursor-pointer"></i>
+                                <i className="bi bi-youtube cursor-pointer"></i>
+                                <i className="bi bi-tiktok cursor-pointer"></i>
+                            </div>
                         </Col>
                     </Row>
-                    <div className="border-top border-light pt-3 mt-3 text-center small">
-                        <p className="mb-0">© 2025 Báo Giáo dục & Thời đại. Tất cả các quyền được bảo lưu.</p>
+                    <div className="footer-bottom border-top border-white border-opacity-25 pt-3 text-center small opacity-50">
+                        <p>© 2025 Báo Giáo dục và Thời đại. Tất cả các quyền được bảo lưu.</p>
                     </div>
                 </Container>
             </footer>
 
-            {/* Modal hiển thị tin */}
             <Modal show={!!selectedArticle} onHide={() => setSelectedArticle(null)} size="lg" centered scrollable>
                 <Modal.Header closeButton className="border-0 bg-light">
                     <Modal.Title className="text-danger fw-bold fs-5">{selectedArticle?.title}</Modal.Title>

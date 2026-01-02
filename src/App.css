@@ -1,38 +1,54 @@
-/* Tùy chỉnh Category Blocks */
-.category-block .category-title {
+/* Layout mở rộng và Category Blocks */
+.news-section-block .section-header-title {
     font-size: 1.1rem;
     letter-spacing: 0.5px;
 }
 
-.category-block i {
-    font-size: 0.8rem;
+.main-block-card .card-title {
+    font-size: 1.4rem;
+    line-height: 1.3;
 }
 
-/* Footer Styles */
-.footer {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+/* Hiệu ứng cắt dòng cho danh sách tin phụ */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-.footer h5 {
+/* Sidebar cập nhật mới */
+.sidebar-news-list {
+    background-color: #fff;
+}
+
+/* Footer Site Styling */
+.footer-site h6 {
     letter-spacing: 1px;
 }
 
-.footer .bi {
-    color: #ffd700; /* Màu vàng nhẹ cho icon trong footer */
+.footer-site .bi {
+    transition: transform 0.2s;
 }
 
-/* Responsive Object Fit */
+.footer-site .bi:hover {
+    transform: scale(1.2);
+    color: #ffd700;
+}
+
+/* Tối ưu hóa ảnh tràn khung */
 .object-fit-cover {
     object-fit: cover;
+    width: 100%;
+    height: 100%;
 }
 
-/* Featured Card Image */
-.featured-img-box {
-    min-height: 350px;
+.ratio-1x1 {
+    min-width: 80px;
 }
 
-@media (max-width: 768px) {
-    .featured-img-box {
-        min-height: 200px;
-    }
+/* Banner quảng cáo */
+.banner-top img {
+    max-height: 120px;
+    object-fit: cover;
 }
