@@ -101,7 +101,6 @@ export const CATEGORY_TREE = [
             { id: 114, name: "Tiêu điểm", url: "https://giaoducthoidai.vn/rss/tieu-diem-48.rss" }
         ]
     },
-    // --- CẬP NHẬT PHẦN VĂN HÓA ---
     {
         id: 12,
         name: "Văn hóa",
@@ -112,10 +111,14 @@ export const CATEGORY_TREE = [
             { id: 123, name: "Sao", url: "https://giaoducthoidai.vn/rss/the-gioi-sao-49.rss" }
         ]
     },
-    // -----------------------------
+
     {
         id: 13,
         name: "Thể thao",
-        url: "https://giaoducthoidai.vn/rss/the-thao-12.rss"
+        url: "https://giaoducthoidai.vn/rss/the-thao-12.rss",
+        children: [
+            { id: 131, name: "Thể thao học đường", url: "https://giaoducthoidai.vn/rss/the-thao-hoc-duong-25.rss" }
+        ]
     }
+
 ];
