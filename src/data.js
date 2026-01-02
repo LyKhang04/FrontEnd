@@ -69,7 +69,7 @@ export const CATEGORY_TREE = [
         id: 8,
         name: "Nhân ái",
         url: "https://giaoducthoidai.vn/rss/nhan-ai-23.rss",
-     
+
         children: [
             { id: 81, name: "Vòng tay nhân ái", url: "https://giaoducthoidai.vn/rss/vong-tay-nhan-ai-24.rss" },
             { id: 82, name: "Hồi âm", url: "https://giaoducthoidai.vn/rss/hoi-am-25.rss" },
