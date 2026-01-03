@@ -7,13 +7,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
 
-// --- DANH SÁCH 12 KHỐI DANH MỤC HIỂN THỊ Ở TRANG CHỦ (ĐÃ SỬA ID TRÙNG) ---
+// --- DANH SÁCH 12 KHỐI DANH MỤC HIỂN THỊ Ở TRANG CHỦ (ĐÃ CHUẨN HÓA URL) ---
 const HOME_BLOCKS = [
     { name: "Giáo dục", url: "https://giaoducthoidai.vn/rss/giao-duc-2.rss" },
     { name: "Thời sự", url: "https://giaoducthoidai.vn/rss/thoi-su-1.rss" },
     { name: "Giáo dục pháp luật", url: "https://giaoducthoidai.vn/rss/phap-luat-5.rss" },
-    { name: "Kết nối", url: "https://giaoducthoidai.vn/rss/dong-hanh-37.rss" }, // Đã sửa
-    { name: "Trao đổi", url: "https://giaoducthoidai.vn/rss/goc-nhin-7.rss" }, // Đã sửa
+    { name: "Kết nối", url: "https://giaoducthoidai.vn/rss/dong-hanh-37.rss" }, // ID 37
+    { name: "Trao đổi", url: "https://giaoducthoidai.vn/rss/goc-nhin-7.rss" }, // ID 7 (Tránh trùng ID 4)
     { name: "Học đường", url: "https://giaoducthoidai.vn/rss/hoc-duong-14.rss" },
     { name: "Nhân ái", url: "https://giaoducthoidai.vn/rss/nhan-ai-23.rss" },
     { name: "Thế giới", url: "https://giaoducthoidai.vn/rss/the-gioi-10.rss" },
@@ -45,9 +45,10 @@ function App() {
         return description.replace(/<[^>]*>?/gm, '').substring(0, 150) + "...";
     };
 
-    // --- LOGIC LẤY RSS CÓ TIMESTAMP (CHỐNG CACHE) ---
+    // --- LOGIC LẤY RSS CÓ FIX CACHE ---
     const getRSSData = async (url) => {
         try {
+            // Thêm timestamp để đảm bảo server trả về dữ liệu mới, tránh trang trắng
             const uniqueUrl = `${url}?t=${new Date().getTime()}`;
             const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(uniqueUrl)}`;
 
@@ -72,7 +73,7 @@ function App() {
     const fetchRSS = async (url, name) => {
         setLoading(true);
         setCurrentCatName(name);
-        setArticles([]); // Reset để tránh hiện tin cũ
+        setArticles([]); // Xóa bài cũ
 
         setTimeout(async () => {
             const data = await getRSSData(url);
@@ -110,7 +111,7 @@ function App() {
         }
     };
 
-    // --- KHỞI TẠO ---
+    // --- EFFECT KHỞI TẠO ---
     useEffect(() => {
         if (CATEGORY_TREE.length > 0) {
             fetchRSS(CATEGORY_TREE[0].url, "Trang chủ");
@@ -244,7 +245,7 @@ function App() {
                             <div className="text-center py-5"><Spinner animation="border" variant="danger" /></div>
                         ) : (
                             <>
-                                {/* TOÀN CẢNH - SỰ KIỆN (Chỉ hiện trang chủ) */}
+                                {/* TOÀN CẢNH (Chỉ ở trang chủ) */}
                                 {currentCatName === "Trang chủ" && articles.length > 0 && (
                                     <div className="mb-5">
                                         <div className="toan-canh-title mb-4 d-flex align-items-center">
@@ -279,13 +280,12 @@ function App() {
                                     </div>
                                 )}
 
-                                {/* DANH SÁCH TIN (Khi không ở trang chủ) */}
+                                {/* LIST TIN (Khi không ở trang chủ) */}
                                 {currentCatName !== "Trang chủ" && (
                                     <>
                                         <div className="section-title mb-4 border-bottom pb-2 border-danger border-2">
                                             <h5 className="fw-bold text-danger text-uppercase mb-0">{currentCatName}</h5>
                                         </div>
-
                                         {articles.length === 0 ? (
                                             <div className="text-center py-5 text-muted bg-light rounded">
                                                 <i className="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
@@ -320,7 +320,7 @@ function App() {
                                     </>
                                 )}
 
-                                {/* CÁC KHỐI DANH MỤC (Chỉ hiện ở Trang chủ) */}
+                                {/* KHỐI DANH MỤC (Chỉ ở trang chủ) */}
                                 {currentCatName === "Trang chủ" && HOME_BLOCKS.map((block, idx) => (
                                     <NewsSection
                                         key={idx}
