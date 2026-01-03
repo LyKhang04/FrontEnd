@@ -9,7 +9,7 @@ export const CATEGORY_TREE = [
         name: "Giáo dục",
         url: "https://giaoducthoidai.vn/rss/giao-duc-2.rss",
         children: [
-            { id: 21, name: "Chính sách", url: "https://giaoducthoidai.vn/rss/chinh-sach-60.rss" },
+            { id: 21, name: "Chính sách", url: "https://giaoducthoidai.vn/rss/chinh-sach-quan-ly-12.rss" },
             { id: 22, name: "Địa phương", url: "https://giaoducthoidai.vn/rss/dia-phuong-13.rss" },
             { id: 23, name: "Đào tạo - Tuyển sinh", url: "https://giaoducthoidai.vn/rss/tuyen-sinh-du-hoc-16.rss" },
             { id: 24, name: "Bốn phương", url: "https://giaoducthoidai.vn/rss/bon-phuong-18.rss" },
@@ -49,7 +49,7 @@ export const CATEGORY_TREE = [
     {
         id: 6,
         name: "Trao đổi",
-        url: "https://giaoducthoidai.vn/rss/goc-nhin-7.rss",
+        url: "https://giaoducthoidai.vn/rss/goc-chuyen-gia-40.rss",
         children: [
             { id: 61, name: "Phương pháp", url: "https://giaoducthoidai.vn/rss/phuong-phap-17.rss" },
             { id: 62, name: "Góc chuyên gia", url: "https://giaoducthoidai.vn/rss/goc-chuyen-gia-40.rss" }
@@ -119,7 +119,7 @@ export const CATEGORY_TREE = [
     {
         id: 13,
         name: "Thể thao",
-        url: "https://giaoducthoidai.vn/rss/the-thao-12.rss",
+        url: "https://giaoducthoidai.vn/rss/the-thao-15.rss",
         children: [
             { id: 131, name: "Thể thao học đường", url: "https://giaoducthoidai.vn/rss/the-thao-hoc-duong-57.rss" }
         ]
