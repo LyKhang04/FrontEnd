@@ -7,20 +7,21 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
 
-// --- DANH SÁCH 12 KHỐI DANH MỤC HIỂN THỊ Ở TRANG CHỦ (ĐÃ CHUẨN HÓA URL) ---
+// --- DANH SÁCH 12 KHỐI DANH MỤC HIỂN THỊ Ở TRANG CHỦ ---
+// Lưu ý: Các link này đã được chọn lọc để tránh trùng ID với các mục con trong Menu
 const HOME_BLOCKS = [
     { name: "Giáo dục", url: "https://giaoducthoidai.vn/rss/giao-duc-2.rss" },
     { name: "Thời sự", url: "https://giaoducthoidai.vn/rss/thoi-su-1.rss" },
     { name: "Giáo dục pháp luật", url: "https://giaoducthoidai.vn/rss/phap-luat-5.rss" },
-    { name: "Kết nối", url: "https://giaoducthoidai.vn/rss/dong-hanh-37.rss" }, // ID 37
-    { name: "Trao đổi", url: "https://giaoducthoidai.vn/rss/goc-nhin-7.rss" }, // ID 7 (Tránh trùng ID 4)
+    { name: "Kết nối", url: "https://giaoducthoidai.vn/rss/dong-hanh-37.rss" }, // ID 37 (Tránh trùng ID 20 của Y học)
+    { name: "Trao đổi", url: "https://giaoducthoidai.vn/rss/goc-nhin-7.rss" }, // ID 7 (Tránh trùng ID 4 của Xã hội)
     { name: "Học đường", url: "https://giaoducthoidai.vn/rss/hoc-duong-14.rss" },
     { name: "Nhân ái", url: "https://giaoducthoidai.vn/rss/nhan-ai-23.rss" },
     { name: "Thế giới", url: "https://giaoducthoidai.vn/rss/the-gioi-10.rss" },
-    { name: "Sức khoẻ", url: "https://giaoducthoidai.vn/rss/suc-khoe-19.rss" },
+    { name: "Sức khoẻ", url: "https://giaoducthoidai.vn/rss/suc-khoe-19.rss" }, // ID 19
     { name: "Media", url: "https://giaoducthoidai.vn/rss/video-media-11.rss" },
     { name: "Văn hóa", url: "https://giaoducthoidai.vn/rss/van-hoa-8.rss" },
-    { name: "Thể thao", url: "https://giaoducthoidai.vn/rss/the-thao-12.rss" }
+    { name: "Thể thao", url: "https://giaoducthoidai.vn/rss/the-thao-12.rss" } // ID 12
 ];
 
 function App() {
@@ -45,10 +46,10 @@ function App() {
         return description.replace(/<[^>]*>?/gm, '').substring(0, 150) + "...";
     };
 
-    // --- LOGIC LẤY RSS CÓ FIX CACHE ---
+    // --- LOGIC LẤY RSS CÓ FIX CACHE & LỖI TRANG TRẮNG ---
     const getRSSData = async (url) => {
         try {
-            // Thêm timestamp để đảm bảo server trả về dữ liệu mới, tránh trang trắng
+            // Thêm timestamp để ép server trả dữ liệu mới nhất
             const uniqueUrl = `${url}?t=${new Date().getTime()}`;
             const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(uniqueUrl)}`;
 
@@ -69,12 +70,13 @@ function App() {
         }
     };
 
-    // --- XỬ LÝ SỰ KIỆN ---
+    // --- XỬ LÝ SỰ KIỆN CLICK MENU ---
     const fetchRSS = async (url, name) => {
         setLoading(true);
         setCurrentCatName(name);
-        setArticles([]); // Xóa bài cũ
+        setArticles([]); // Xóa bài cũ ngay lập tức
 
+        // Thêm độ trễ nhỏ 300ms để hiệu ứng loading hiển thị rõ ràng
         setTimeout(async () => {
             const data = await getRSSData(url);
             setArticles(data);
@@ -83,6 +85,7 @@ function App() {
         }, 300);
     };
 
+    // --- XỬ LÝ XEM CHI TIẾT BÀI VIẾT ---
     const crawlArticle = async (article) => {
         setSelectedArticle(article);
         setIsCrawling(true);
@@ -111,24 +114,26 @@ function App() {
         }
     };
 
-    // --- EFFECT KHỞI TẠO ---
+    // --- EFFECT KHỞI TẠO (CHẠY 1 LẦN) ---
     useEffect(() => {
+        // 1. Tải trang chủ
         if (CATEGORY_TREE.length > 0) {
             fetchRSS(CATEGORY_TREE[0].url, "Trang chủ");
         }
 
+        // 2. Tải ngầm dữ liệu cho 12 khối danh mục trang chủ
         const fetchHomeBlocks = async () => {
             const blockData = {};
             await Promise.all(HOME_BLOCKS.map(async (block) => {
                 const items = await getRSSData(block.url);
-                blockData[block.name] = items.slice(0, 5);
+                blockData[block.name] = items.slice(0, 5); // Lấy 5 tin mới nhất
             }));
             setHomeBlockArticles(blockData);
         };
         fetchHomeBlocks();
     }, []);
 
-    // --- COMPONENT KHỐI TIN ---
+    // --- COMPONENT KHỐI TIN TỨC ---
     const NewsSection = ({ title, data, onTitleClick }) => {
         if (!data || data.length === 0) return null;
 
@@ -173,6 +178,7 @@ function App() {
         );
     };
 
+    // --- GIAO DIỆN CHÍNH ---
     return (
         <div className="app-container">
             {/* Top Bar */}
@@ -245,7 +251,7 @@ function App() {
                             <div className="text-center py-5"><Spinner animation="border" variant="danger" /></div>
                         ) : (
                             <>
-                                {/* TOÀN CẢNH (Chỉ ở trang chủ) */}
+                                {/* TOÀN CẢNH - SỰ KIỆN (Chỉ ở trang chủ) */}
                                 {currentCatName === "Trang chủ" && articles.length > 0 && (
                                     <div className="mb-5">
                                         <div className="toan-canh-title mb-4 d-flex align-items-center">
@@ -286,6 +292,7 @@ function App() {
                                         <div className="section-title mb-4 border-bottom pb-2 border-danger border-2">
                                             <h5 className="fw-bold text-danger text-uppercase mb-0">{currentCatName}</h5>
                                         </div>
+
                                         {articles.length === 0 ? (
                                             <div className="text-center py-5 text-muted bg-light rounded">
                                                 <i className="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
