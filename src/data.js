@@ -9,12 +9,11 @@ export const CATEGORY_TREE = [
         name: "Giáo dục",
         url: "https://giaoducthoidai.vn/rss/giao-duc-2.rss",
         children: [
-            // Sửa ID 12 (trùng Thể thao) thành 60
             { id: 21, name: "Chính sách", url: "https://giaoducthoidai.vn/rss/chinh-sach-60.rss" },
             { id: 22, name: "Địa phương", url: "https://giaoducthoidai.vn/rss/dia-phuong-13.rss" },
             { id: 23, name: "Đào tạo - Tuyển sinh", url: "https://giaoducthoidai.vn/rss/tuyen-sinh-du-hoc-16.rss" },
             { id: 24, name: "Bốn phương", url: "https://giaoducthoidai.vn/rss/bon-phuong-18.rss" },
-            { id: 25, name: "Chuyển động", url: "https://giaoducthoidai.vn/rss/chuyen-dong-19.rss" }
+            { id: 25, name: "Chuyển động", url: "https://giaoducthoidai.vn/rss/chuyen-dong-55.rss" }
         ]
     },
     {
@@ -39,7 +38,6 @@ export const CATEGORY_TREE = [
     {
         id: 5,
         name: "Kết nối",
-        // Sửa ID 20 (trùng Y học) thành 37
         url: "https://giaoducthoidai.vn/rss/dong-hanh-37.rss",
         children: [
             { id: 51, name: "Công đoàn", url: "https://giaoducthoidai.vn/rss/cong-doan-35.rss" },
@@ -51,7 +49,6 @@ export const CATEGORY_TREE = [
     {
         id: 6,
         name: "Trao đổi",
-        // Sửa ID 4 (trùng Xã hội) thành 7 (Góc nhìn)
         url: "https://giaoducthoidai.vn/rss/goc-nhin-7.rss",
         children: [
             { id: 61, name: "Phương pháp", url: "https://giaoducthoidai.vn/rss/phuong-phap-17.rss" },
@@ -63,7 +60,7 @@ export const CATEGORY_TREE = [
         name: "Học đường",
         url: "https://giaoducthoidai.vn/rss/hoc-duong-14.rss",
         children: [
-            { id: 71, name: "Kỹ năng", url: "https://giaoducthoidai.vn/rss/ky-nang-26.rss" },
+            { id: 71, name: "Kỹ năng", url: "https://giaoducthoidai.vn/rss/ky-nang-56.rss" },
             { id: 72, name: "Du học", url: "https://giaoducthoidai.vn/rss/du-hoc-28.rss" },
             { id: 73, name: "Thể chất", url: "https://giaoducthoidai.vn/rss/the-chat-27.rss" }
         ]
@@ -93,9 +90,9 @@ export const CATEGORY_TREE = [
         name: "Sức khoẻ",
         url: "https://giaoducthoidai.vn/rss/suc-khoe-19.rss",
         children: [
-            { id: 101, name: "Khoẻ đẹp", url: "https://giaoducthoidai.vn/rss/suc-khoe-19.rss" },
+            { id: 101, name: "Khoẻ đẹp", url: "https://giaoducthoidai.vn/rss/y-hoc-20.rss" },
             { id: 102, name: "Gia đình", url: "https://giaoducthoidai.vn/rss/dinh-duong-21.rss" },
-            { id: 103, name: "Đẩy lùi Covid-19", url: "https://giaoducthoidai.vn/rss/y-hoc-20.rss" }
+            { id: 103, name: "Đẩy lùi Covid-19", url: "https://giaoducthoidai.vn/rss/suc-khoe-19.rss" }
         ]
     },
     {
@@ -124,7 +121,7 @@ export const CATEGORY_TREE = [
         name: "Thể thao",
         url: "https://giaoducthoidai.vn/rss/the-thao-12.rss",
         children: [
-            { id: 131, name: "Thể thao học đường", url: "https://giaoducthoidai.vn/rss/the-thao-hoc-duong-25.rss" }
+            { id: 131, name: "Thể thao học đường", url: "https://giaoducthoidai.vn/rss/the-thao-hoc-duong-57.rss" }
         ]
     }
 ];
