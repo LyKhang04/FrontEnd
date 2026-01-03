@@ -7,13 +7,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
 
-// --- DANH SÁCH 12 KHỐI DANH MỤC HIỂN THỊ Ở TRANG CHỦ (Đã chuẩn hóa ID để tránh trùng tin) ---
+// --- DANH SÁCH 12 KHỐI DANH MỤC HIỂN THỊ Ở TRANG CHỦ (ĐÃ SỬA ID TRÙNG) ---
 const HOME_BLOCKS = [
     { name: "Giáo dục", url: "https://giaoducthoidai.vn/rss/giao-duc-2.rss" },
     { name: "Thời sự", url: "https://giaoducthoidai.vn/rss/thoi-su-1.rss" },
     { name: "Giáo dục pháp luật", url: "https://giaoducthoidai.vn/rss/phap-luat-5.rss" },
-    { name: "Kết nối", url: "https://giaoducthoidai.vn/rss/dong-hanh-37.rss" }, // ID 37: Đồng hành (tránh trùng Thể thao)
-    { name: "Trao đổi", url: "https://giaoducthoidai.vn/rss/goc-nhin-7.rss" }, // ID 7: Góc nhìn (tránh trùng Xã hội)
+    { name: "Kết nối", url: "https://giaoducthoidai.vn/rss/dong-hanh-37.rss" }, // Đã sửa
+    { name: "Trao đổi", url: "https://giaoducthoidai.vn/rss/goc-nhin-7.rss" }, // Đã sửa
     { name: "Học đường", url: "https://giaoducthoidai.vn/rss/hoc-duong-14.rss" },
     { name: "Nhân ái", url: "https://giaoducthoidai.vn/rss/nhan-ai-23.rss" },
     { name: "Thế giới", url: "https://giaoducthoidai.vn/rss/the-gioi-10.rss" },
@@ -24,12 +24,9 @@ const HOME_BLOCKS = [
 ];
 
 function App() {
-    // State quản lý dữ liệu
-    const [articles, setArticles] = useState([]); // Dữ liệu tin chính (theo menu)
-    const [homeBlockArticles, setHomeBlockArticles] = useState({}); // Dữ liệu riêng cho từng khối ở trang chủ
+    const [articles, setArticles] = useState([]);
+    const [homeBlockArticles, setHomeBlockArticles] = useState({});
     const [loading, setLoading] = useState(false);
-
-    // State quản lý giao diện & Modal
     const [selectedArticle, setSelectedArticle] = useState(null);
     const [detailContent, setDetailContent] = useState("");
     const [isCrawling, setIsCrawling] = useState(false);
@@ -48,10 +45,9 @@ function App() {
         return description.replace(/<[^>]*>?/gm, '').substring(0, 150) + "...";
     };
 
-    // --- LOGIC QUAN TRỌNG: LẤY RSS CÓ FIX CACHE ---
+    // --- LOGIC LẤY RSS CÓ TIMESTAMP (CHỐNG CACHE) ---
     const getRSSData = async (url) => {
         try {
-            // Thêm timestamp (?t=...) để bắt buộc server trả về dữ liệu mới nhất
             const uniqueUrl = `${url}?t=${new Date().getTime()}`;
             const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(uniqueUrl)}`;
 
@@ -73,14 +69,11 @@ function App() {
     };
 
     // --- XỬ LÝ SỰ KIỆN ---
-
-    // 1. Khi bấm vào Menu hoặc Danh mục
     const fetchRSS = async (url, name) => {
         setLoading(true);
         setCurrentCatName(name);
-        setArticles([]); // Xóa bài cũ để tránh hiện nhầm tin của mục trước
+        setArticles([]); // Reset để tránh hiện tin cũ
 
-        // Thêm độ trễ nhỏ để UI mượt mà hơn và đảm bảo loading hiển thị
         setTimeout(async () => {
             const data = await getRSSData(url);
             setArticles(data);
@@ -89,7 +82,6 @@ function App() {
         }, 300);
     };
 
-    // 2. Khi bấm xem chi tiết bài viết (Crawl content)
     const crawlArticle = async (article) => {
         setSelectedArticle(article);
         setIsCrawling(true);
@@ -101,7 +93,6 @@ function App() {
             const content = dom.querySelector('.detail-content') || dom.querySelector('article') || dom.querySelector('.content');
 
             if (content) {
-                // Fix link ảnh và xóa rác
                 content.querySelectorAll('img').forEach(img => {
                     img.className = "img-fluid rounded shadow-sm my-3 d-block mx-auto";
                     const src = img.getAttribute('src');
@@ -119,27 +110,24 @@ function App() {
         }
     };
 
-    // --- EFFECT KHỞI TẠO ---
+    // --- KHỞI TẠO ---
     useEffect(() => {
-        // 1. Tải dữ liệu cho Trang chủ lần đầu
         if (CATEGORY_TREE.length > 0) {
             fetchRSS(CATEGORY_TREE[0].url, "Trang chủ");
         }
 
-        // 2. Tải ngầm dữ liệu cho 12 khối danh mục (Giáo dục, Thời sự,...)
         const fetchHomeBlocks = async () => {
             const blockData = {};
-            // Dùng Promise.all để tải song song cho nhanh
             await Promise.all(HOME_BLOCKS.map(async (block) => {
                 const items = await getRSSData(block.url);
-                blockData[block.name] = items.slice(0, 5); // Chỉ lấy 5 tin mỗi mục
+                blockData[block.name] = items.slice(0, 5);
             }));
             setHomeBlockArticles(blockData);
         };
         fetchHomeBlocks();
     }, []);
 
-    // --- SUB-COMPONENT: KHỐI TIN TỨC THEO DANH MỤC ---
+    // --- COMPONENT KHỐI TIN ---
     const NewsSection = ({ title, data, onTitleClick }) => {
         if (!data || data.length === 0) return null;
 
@@ -152,7 +140,6 @@ function App() {
                     <Nav.Link className="text-muted small p-0" onClick={onTitleClick}>Xem thêm <i className="bi bi-chevron-double-right"></i></Nav.Link>
                 </div>
                 <Row>
-                    {/* Tin lớn bên trái */}
                     <Col md={7}>
                         {data[0] && (
                             <Card className="border-0 shadow-sm h-100 main-block-card cursor-pointer" onClick={() => crawlArticle(data[0])}>
@@ -166,7 +153,6 @@ function App() {
                             </Card>
                         )}
                     </Col>
-                    {/* Danh sách tin nhỏ bên phải */}
                     <Col md={5}>
                         <div className="sub-news-list">
                             {data.slice(1, 5).map((item, idx) => (
@@ -186,10 +172,9 @@ function App() {
         );
     };
 
-    // --- GIAO DIỆN CHÍNH ---
     return (
         <div className="app-container">
-            {/* 1. TOP INFO BAR */}
+            {/* Top Bar */}
             <div className="top-info-bar bg-light border-bottom py-1">
                 <Container className="d-flex justify-content-start align-items-center small text-secondary">
                     <span className="me-3"><i className="bi bi-clock me-1"></i> {new Date().toLocaleDateString('vi-VN')}</span>
@@ -198,7 +183,7 @@ function App() {
                 </Container>
             </div>
 
-            {/* 2. HEADER LOGO & SEARCH */}
+            {/* Header */}
             <header className="bg-white py-3">
                 <Container className="d-flex justify-content-between align-items-center flex-wrap">
                     <div className="logo-box cursor-pointer" onClick={() => fetchRSS(CATEGORY_TREE[0].url, "Trang chủ")}>
@@ -220,7 +205,7 @@ function App() {
                 </Container>
             </header>
 
-            {/* 3. NAVBAR (MENU ĐỎ) */}
+            {/* Navbar */}
             <Navbar bg="danger" variant="dark" expand="lg" className="py-0 sticky-top main-nav shadow-sm">
                 <Container>
                     <Navbar.Toggle aria-controls="main-navbar" />
@@ -229,8 +214,6 @@ function App() {
                             <Nav.Link onClick={() => fetchRSS(CATEGORY_TREE[0].url, "Trang chủ")} className="py-2 px-3 bg-danger-dark">
                                 <i className="bi bi-house-door-fill fs-5"></i>
                             </Nav.Link>
-
-                            {/* Render Menu từ DATA.JS */}
                             {CATEGORY_TREE.slice(1, 14).map((item, i) => (
                                 item.children ? (
                                     <NavDropdown key={i} title={item.name} id={`nav-${i}`} className="custom-dropdown text-white fw-bold text-uppercase">
@@ -249,21 +232,19 @@ function App() {
                 </Container>
             </Navbar>
 
-            {/* 4. NỘI DUNG CHÍNH */}
+            {/* Main Content */}
             <Container className="mt-4">
-                {/* Banner Quảng Cáo Top */}
                 <div className="banner-top mb-4 rounded overflow-hidden shadow-sm">
                     <img src="https://giaoducthoidai.vn/images/banner_default.jpg" className="w-100" alt="Quảng cáo" onError={(e) => e.target.style.display='none'} />
                 </div>
 
                 <Row>
-                    {/* === CỘT CHÍNH (Chiếm 9 phần) === */}
                     <Col lg={9}>
                         {loading ? (
                             <div className="text-center py-5"><Spinner animation="border" variant="danger" /></div>
                         ) : (
                             <>
-                                {/* SECTION: TOÀN CẢNH - SỰ KIỆN (Chỉ hiện ở Trang chủ) */}
+                                {/* TOÀN CẢNH - SỰ KIỆN (Chỉ hiện trang chủ) */}
                                 {currentCatName === "Trang chủ" && articles.length > 0 && (
                                     <div className="mb-5">
                                         <div className="toan-canh-title mb-4 d-flex align-items-center">
@@ -273,15 +254,10 @@ function App() {
                                             <span className="flex-grow-1 ms-3 border-bottom"></span>
                                         </div>
                                         <Row>
-                                            {/* Tin lớn nhất (Tin số 1) */}
                                             <Col md={7}>
                                                 <Card className="border-0 shadow-sm h-100 cursor-pointer" onClick={() => crawlArticle(articles[0])}>
                                                     <div className="ratio ratio-4x3 bg-light overflow-hidden rounded">
-                                                        {articles[0].imageUrl ? (
-                                                            <img src={articles[0].imageUrl} className="object-fit-cover" alt="" />
-                                                        ) : (
-                                                            <div className="d-flex align-items-center justify-content-center h-100"><i className="bi bi-card-image fs-1 text-muted"></i></div>
-                                                        )}
+                                                        {articles[0].imageUrl ? <img src={articles[0].imageUrl} className="object-fit-cover" alt="" /> : <div className="d-flex align-items-center justify-content-center h-100"><i className="bi bi-card-image fs-1 text-muted"></i></div>}
                                                     </div>
                                                     <Card.Body className="px-0">
                                                         <Card.Title className="fw-bold fs-3 hover-blue mt-2">{articles[0].title}</Card.Title>
@@ -289,17 +265,11 @@ function App() {
                                                     </Card.Body>
                                                 </Card>
                                             </Col>
-
-                                            {/* List 5 tin bên cạnh (Tin số 2-6) */}
                                             <Col md={5}>
                                                 {articles.slice(1, 6).map((item, idx) => (
                                                     <div key={idx} className="d-flex mb-3 pb-3 border-bottom align-items-start cursor-pointer" onClick={() => crawlArticle(item)}>
                                                         <div className="flex-shrink-0 ratio ratio-16x9 bg-light rounded overflow-hidden me-2" style={{ width: '120px' }}>
-                                                            {item.imageUrl ? (
-                                                                <img src={item.imageUrl} className="object-fit-cover" alt="" />
-                                                            ) : (
-                                                                <i className="bi bi-image m-auto text-muted"></i>
-                                                            )}
+                                                            {item.imageUrl ? <img src={item.imageUrl} className="object-fit-cover" alt="" /> : <i className="bi bi-image m-auto text-muted"></i>}
                                                         </div>
                                                         <h6 className="fw-bold small hover-blue mb-0 line-clamp-3">{item.title}</h6>
                                                     </div>
@@ -309,14 +279,13 @@ function App() {
                                     </div>
                                 )}
 
-                                {/* SECTION: DANH SÁCH TIN THƯỜNG (Khi không ở trang chủ) */}
+                                {/* DANH SÁCH TIN (Khi không ở trang chủ) */}
                                 {currentCatName !== "Trang chủ" && (
                                     <>
                                         <div className="section-title mb-4 border-bottom pb-2 border-danger border-2">
                                             <h5 className="fw-bold text-danger text-uppercase mb-0">{currentCatName}</h5>
                                         </div>
 
-                                        {/* Kiểm tra nếu không có tin */}
                                         {articles.length === 0 ? (
                                             <div className="text-center py-5 text-muted bg-light rounded">
                                                 <i className="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
@@ -351,7 +320,7 @@ function App() {
                                     </>
                                 )}
 
-                                {/* SECTION: 12 KHỐI DANH MỤC (Chỉ hiện ở Trang chủ) */}
+                                {/* CÁC KHỐI DANH MỤC (Chỉ hiện ở Trang chủ) */}
                                 {currentCatName === "Trang chủ" && HOME_BLOCKS.map((block, idx) => (
                                     <NewsSection
                                         key={idx}
@@ -364,9 +333,8 @@ function App() {
                         )}
                     </Col>
 
-                    {/* === CỘT SIDEBAR (Chiếm 3 phần) === */}
+                    {/* Sidebar */}
                     <Col lg={3}>
-                        {/* Sidebar: Mới cập nhật */}
                         <div className="sidebar-box mb-4">
                             <div className="sidebar-header bg-danger text-white p-2 fw-bold text-uppercase mb-0">
                                 <i className="bi bi-star-fill me-2 text-warning"></i> Mới cập nhật
@@ -381,7 +349,6 @@ function App() {
                             </div>
                         </div>
 
-                        {/* Sidebar: Suy ngẫm */}
                         <div className="sidebar-box mb-4">
                             <div className="sidebar-header p-2 fw-bold text-uppercase mb-0 border-start border-5 border-danger text-danger bg-light">
                                 SUY NGẪM
@@ -392,7 +359,6 @@ function App() {
                             </div>
                         </div>
 
-                        {/* Sidebar: Banner Báo in */}
                         <div className="baoin-banner text-center text-white p-4 rounded shadow-sm d-flex flex-column align-items-center justify-content-center cursor-pointer mb-4">
                             <i className="bi bi-newspaper fs-1 mb-2"></i>
                             <h5 className="fw-bold mb-0">ĐỌC BÁO IN</h5>
@@ -402,7 +368,7 @@ function App() {
                 </Row>
             </Container>
 
-            {/* 5. FOOTER */}
+            {/* Footer */}
             <footer className="footer-site mt-5 pt-5 pb-3 text-white" style={{ backgroundColor: '#c92127' }}>
                 <Container>
                     <Row className="mb-4">
@@ -437,7 +403,7 @@ function App() {
                 </Container>
             </footer>
 
-            {/* 6. MODAL CHI TIẾT BÀI VIẾT */}
+            {/* Modal */}
             <Modal show={!!selectedArticle} onHide={() => setSelectedArticle(null)} size="lg" centered scrollable>
                 <Modal.Header closeButton className="border-0 bg-light">
                     <Modal.Title className="text-danger fw-bold fs-5">{selectedArticle?.title}</Modal.Title>
