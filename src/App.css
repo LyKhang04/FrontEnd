@@ -1,11 +1,11 @@
-/* Style cho Toàn cảnh - Sự kiện */
+
 .toan-canh-title h4 {
     border-bottom: 2px solid #dc3545;
     padding-bottom: 5px;
     display: inline-block;
 }
 
-/* Sidebar Styles */
+
 .sidebar-header {
     font-size: 0.9rem;
     letter-spacing: 0.5px;
@@ -16,7 +16,7 @@
     overflow-y: auto;
 }
 
-/* Banner Báo in */
+
 .baoin-banner {
     background: linear-gradient(135deg, #c92127 0%, #ff5252 100%);
     transition: transform 0.2s;
@@ -32,28 +32,49 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
-.cursor-pointer {
-    cursor: pointer !important;
+.custom-dropdown .dropdown-toggle {
+    color: white !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }
-.hover-blue {
-    transition: color 0.2s ease-in-out;
+
+.custom-dropdown .dropdown-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.2);
 }
-.hover-blue:hover {
-    color: #0056b3 !important;
-    text-decoration: none;
+
+.custom-dropdown .dropdown-menu {
+    border-radius: 0;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-top: 0;
 }
-.news-card,
-.main-block-card,
-.sub-news-list > div,
-.sidebar-content > div {
-    cursor: pointer;
-    transition: background-color 0.2s;
+
+.custom-dropdown .dropdown-item {
+    font-size: 0.9rem;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: all 0.2s;
 }
-.sub-news-list > div:hover,
-.sidebar-content > div:hover {
-    background-color: #f8f9fa;
+
+.custom-dropdown .dropdown-item:hover {
+    background-color: #fce8e8;
+    color: #c92127;
 }
-.nav-link-custom:hover {
-    background-color: rgba(255,255,255,0.1);
-    border-radius: 4px;
+
+@media (min-width: 992px) {
+    .custom-dropdown:hover .dropdown-menu {
+        display: block;
+        animation: fadeIn 0.2s ease-in-out;
+    }
+
+    .custom-dropdown .dropdown-menu {
+        margin-top: 0px;
+    }
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
 }
