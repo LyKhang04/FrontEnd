@@ -32,3 +32,28 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
+.cursor-pointer {
+    cursor: pointer !important;
+}
+.hover-blue {
+    transition: color 0.2s ease-in-out;
+}
+.hover-blue:hover {
+    color: #0056b3 !important;
+    text-decoration: none;
+}
+.news-card,
+.main-block-card,
+.sub-news-list > div,
+.sidebar-content > div {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.sub-news-list > div:hover,
+.sidebar-content > div:hover {
+    background-color: #f8f9fa;
+}
+.nav-link-custom:hover {
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 4px;
+}
