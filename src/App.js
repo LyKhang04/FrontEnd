@@ -211,13 +211,13 @@ function App() {
 
             {/* Main Content */}
             <Container className="mt-4">
-                {/* Đã xóa Banner Top */}
+
 
                 <Row>
                     <Col lg={9}>
                         {loading ? (<div className="text-center py-5"><Spinner animation="border" variant="danger" /></div>) : (
                             <>
-                                {/* TOÀN CẢNH - SỰ KIỆN */}
+
                                 {currentCatName === "Trang chủ" && articles.length > 0 && (
                                     <div className="mb-5">
                                         <div className="toan-canh-title mb-4 d-flex align-items-center"><h4 className="fw-bold text-danger m-0" style={{ borderBottom: '3px solid #dc3545', paddingBottom: '5px' }}>Toàn cảnh - Sự kiện</h4><span className="flex-grow-1 ms-3 border-bottom"></span></div>
@@ -227,7 +227,7 @@ function App() {
                                         </Row>
                                     </div>
                                 )}
-                                {/* LIST TIN THƯỜNG */}
+
                                 {currentCatName !== "Trang chủ" && (
                                     <>
                                         <div className="section-title mb-4 border-bottom pb-2 border-danger border-2"><h5 className="fw-bold text-danger text-uppercase mb-0">{currentCatName}</h5></div>
@@ -238,7 +238,7 @@ function App() {
                                         )}
                                     </>
                                 )}
-                                {/* KHỐI DANH MỤC TRANG CHỦ */}
+
                                 {currentCatName === "Trang chủ" && HOME_BLOCKS.map((block, idx) => (<NewsSection key={idx} title={block.name} data={homeBlockArticles[block.name] || []} onTitleClick={() => fetchRSS(block.url, block.name)} />))}
                             </>
                         )}
@@ -253,7 +253,7 @@ function App() {
 
             </Container>
 
-          
+
             <footer className="footer-site mt-5 pt-5 pb-3 text-white" style={{ backgroundColor: '#c92127' }}>
                 <Container>
                     <Row className="mb-4">
