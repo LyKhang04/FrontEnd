@@ -6,20 +6,57 @@ import { CATEGORY_TREE } from './data';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
+
+
 const HOME_BLOCKS = [
-    { name: "Giáo dục", url: "https://giaoducthoidai.vn/rss/giao-duc-2.rss" },
-    { name: "Thời sự", url: "https://giaoducthoidai.vn/rss/thoi-su-1.rss" },
+    { name: "Giáo dục", url: "https://giaoducthoidai.vn/rss/giao-duc-2.rss" }, // index 0
+    { name: "Thời sự", url: "https://giaoducthoidai.vn/rss/thoi-su-1.rss" },   // index 1
     { name: "Giáo dục pháp luật", url: "https://giaoducthoidai.vn/rss/phap-luat-5.rss" },
     { name: "Kết nối", url: "https://giaoducthoidai.vn/rss/dong-hanh-37.rss" },
-    { name: "Trao đổi", url: "https://giaoducthoidai.vn/rss/goc-nhin-7.rss" },
+    { name: "Trao đổi", url: "https://giaoducthoidai.vn/rss/goc-nhin-7.rss" }, // index 4
     { name: "Học đường", url: "https://giaoducthoidai.vn/rss/hoc-duong-14.rss" },
     { name: "Nhân ái", url: "https://giaoducthoidai.vn/rss/nhan-ai-23.rss" },
     { name: "Thế giới", url: "https://giaoducthoidai.vn/rss/the-gioi-10.rss" },
-    { name: "Sức khoẻ", url: "https://giaoducthoidai.vn/rss/suc-khoe-19.rss" },
+    { name: "Sức khoẻ", url: "https://giaoducthoidai.vn/rss/suc-khoe-19.rss" }, // index 8
     { name: "Media", url: "https://giaoducthoidai.vn/rss/video-media-11.rss" },
     { name: "Văn hóa", url: "https://giaoducthoidai.vn/rss/van-hoa-8.rss" },
     { name: "Thể thao", url: "https://giaoducthoidai.vn/rss/the-thao-12.rss" }
 ];
+
+
+const INTERSTITIAL_BANNERS = [
+    {
+        afterIndex: 1,
+        imageUrl: "banner1.jpg",
+        alt: "Quảng cáo 1"
+    },
+    {
+        afterIndex: 4,
+        imageUrl: "banner2.jpg",
+        alt: "Quảng cáo 2"
+    },
+    {
+        afterIndex: 8,
+        imageUrl: "banner3.jpg",
+        alt: "Quảng cáo 3"
+    }
+];
+
+
+const InterstitialBanner = ({ imageUrl, alt }) => {
+    if (!imageUrl) return null;
+    return (
+        <div className="interstitial-banner mb-5 rounded overflow-hidden shadow-sm text-center">
+            <img
+                src={imageUrl}
+                className="img-fluid w-100 object-fit-cover"
+                style={{ maxHeight: '150px' }} // Giới hạn chiều cao để không quá chiếm chỗ
+                alt={alt || "Quảng cáo"}
+                onError={(e) => e.target.style.display='none'} // Ẩn nếu lỗi ảnh
+            />
+        </div>
+    );
+};
 
 function App() {
     const [articles, setArticles] = useState([]);
@@ -43,7 +80,7 @@ function App() {
         return description.replace(/<[^>]*>?/gm, '').substring(0, 150) + "...";
     };
 
-
+    // --- LOGIC LẤY RSS CÓ FIX CACHE ---
     const getRSSData = async (url) => {
         try {
             const uniqueUrl = `${url}?t=${new Date().getTime()}`;
@@ -107,6 +144,7 @@ function App() {
         }
     };
 
+    // --- EFFECT KHỞI TẠO ---
     useEffect(() => {
         if (CATEGORY_TREE.length > 0) fetchRSS(CATEGORY_TREE[0].url, "Trang chủ");
         const fetchHomeBlocks = async () => {
@@ -120,7 +158,7 @@ function App() {
         fetchHomeBlocks();
     }, []);
 
-
+    // --- COMPONENT KHỐI TIN ---
     const NewsSection = ({ title, data, onTitleClick }) => {
         if (!data || data.length === 0) return null;
         return (
@@ -211,13 +249,11 @@ function App() {
 
             {/* Main Content */}
             <Container className="mt-4">
-
-
                 <Row>
                     <Col lg={9}>
                         {loading ? (<div className="text-center py-5"><Spinner animation="border" variant="danger" /></div>) : (
                             <>
-
+                                {/* TOÀN CẢNH - SỰ KIỆN (Chỉ ở trang chủ) */}
                                 {currentCatName === "Trang chủ" && articles.length > 0 && (
                                     <div className="mb-5">
                                         <div className="toan-canh-title mb-4 d-flex align-items-center"><h4 className="fw-bold text-danger m-0" style={{ borderBottom: '3px solid #dc3545', paddingBottom: '5px' }}>Toàn cảnh - Sự kiện</h4><span className="flex-grow-1 ms-3 border-bottom"></span></div>
@@ -228,6 +264,7 @@ function App() {
                                     </div>
                                 )}
 
+                                {/* LIST TIN (Khi không ở trang chủ) */}
                                 {currentCatName !== "Trang chủ" && (
                                     <>
                                         <div className="section-title mb-4 border-bottom pb-2 border-danger border-2"><h5 className="fw-bold text-danger text-uppercase mb-0">{currentCatName}</h5></div>
@@ -239,21 +276,44 @@ function App() {
                                     </>
                                 )}
 
-                                {currentCatName === "Trang chủ" && HOME_BLOCKS.map((block, idx) => (<NewsSection key={idx} title={block.name} data={homeBlockArticles[block.name] || []} onTitleClick={() => fetchRSS(block.url, block.name)} />))}
+                                {/* KHỐI DANH MỤC + BANNER XEN KẼ (Chỉ ở trang chủ) */}
+                                {currentCatName === "Trang chủ" && HOME_BLOCKS.map((block, idx) => {
+                                    // Tìm xem có banner nào cần hiện sau khối này không
+                                    const bannerToRender = INTERSTITIAL_BANNERS.find(b => b.afterIndex === idx);
+
+                                    return (
+                                        <React.Fragment key={idx}>
+                                            {/* Hiển thị khối tin tức */}
+                                            <NewsSection
+                                                title={block.name}
+                                                data={homeBlockArticles[block.name] || []}
+                                                onTitleClick={() => fetchRSS(block.url, block.name)}
+                                            />
+
+                                            {/* Hiển thị banner nếu có */}
+                                            {bannerToRender && (
+                                                <InterstitialBanner
+                                                    imageUrl={bannerToRender.imageUrl}
+                                                    alt={bannerToRender.alt}
+                                                />
+                                            )}
+                                        </React.Fragment>
+                                    );
+                                })}
                             </>
                         )}
                     </Col>
+
+                    {/* Sidebar */}
                     <Col lg={3}>
                         <div className="sidebar-box mb-4"><div className="sidebar-header bg-danger text-white p-2 fw-bold text-uppercase mb-0"><i className="bi bi-star-fill me-2 text-warning"></i> Mới cập nhật</div><div className="sidebar-content border border-top-0 p-2 bg-white" style={{maxHeight: '500px', overflowY: 'auto'}}>{articles.slice(6, 15).map((item, idx) => (<div key={idx} className="mb-2 pb-2 border-bottom cursor-pointer" onClick={() => crawlArticle(item)}><h6 className="fw-bold small hover-blue mb-1">{item.title}</h6><span className="text-muted" style={{ fontSize: '0.7rem' }}>Vừa xong</span></div>))}</div></div>
                         <div className="sidebar-box mb-4"><div className="sidebar-header p-2 fw-bold text-uppercase mb-0 border-start border-5 border-danger text-danger bg-light">SUY NGẪM</div><div className="sidebar-content p-3 bg-light"><h6 className="fw-bold mb-2">Sắp nhập trường cao đẳng sư phạm: Tất yếu của đổi mới</h6><p className="small text-muted mb-0">GD&TĐ - Việc sáp nhập các trường cao đẳng sư phạm là xu thế tất yếu nhằm nâng cao chất lượng...</p></div></div>
                         <div className="baoin-banner text-center text-white p-4 rounded shadow-sm d-flex flex-column align-items-center justify-content-center cursor-pointer mb-4"><i className="bi bi-newspaper fs-1 mb-2"></i><h5 className="fw-bold mb-0">ĐỌC BÁO IN</h5><h5 className="fw-bold">ONLINE</h5></div>
                     </Col>
                 </Row>
-
-
             </Container>
 
-
+            {/* Footer */}
             <footer className="footer-site mt-5 pt-5 pb-3 text-white" style={{ backgroundColor: '#c92127' }}>
                 <Container>
                     <Row className="mb-4">
@@ -270,6 +330,7 @@ function App() {
                 </Container>
             </footer>
 
+            {/* Modal */}
             <Modal show={!!selectedArticle} onHide={() => setSelectedArticle(null)} size="lg" centered scrollable>
                 <Modal.Header closeButton className="border-0 bg-light"><Modal.Title className="text-danger fw-bold fs-5">{selectedArticle?.title}</Modal.Title></Modal.Header>
                 <Modal.Body className="article-content-body px-4 py-3">{isCrawling ? <div className="text-center py-5"><Spinner animation="grow" variant="danger" /></div> : <div dangerouslySetInnerHTML={{ __html: detailContent }} />}</Modal.Body>
