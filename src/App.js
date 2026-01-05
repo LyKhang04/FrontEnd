@@ -7,7 +7,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
 
+// --- IMPORT ẢNH BANNER CÓ SẴN TRONG THƯ MỤC ---
+import banner1 from './banner1.jpg';
+import banner2 from './banner2.jpg';
+import banner3 from './banner3.jpg';
 
+// --- DANH SÁCH 12 KHỐI DANH MỤC HIỂN THỊ Ở TRANG CHỦ ---
 const HOME_BLOCKS = [
     { name: "Giáo dục", url: "https://giaoducthoidai.vn/rss/giao-duc-2.rss" }, // index 0
     { name: "Thời sự", url: "https://giaoducthoidai.vn/rss/thoi-su-1.rss" },   // index 1
@@ -23,26 +28,26 @@ const HOME_BLOCKS = [
     { name: "Thể thao", url: "https://giaoducthoidai.vn/rss/the-thao-12.rss" }
 ];
 
-
+// --- CẤU HÌNH VỊ TRÍ BANNER ---
 const INTERSTITIAL_BANNERS = [
     {
-        afterIndex: 1,
-        imageUrl: "banner1.jpg",
+        afterIndex: 1, // Hiện sau mục "Thời sự"
+        imageUrl: banner1, // Sử dụng biến đã import
         alt: "Quảng cáo 1"
     },
     {
-        afterIndex: 4,
-        imageUrl: "banner2.jpg",
+        afterIndex: 4, // Hiện sau mục "Trao đổi"
+        imageUrl: banner2, // Sử dụng biến đã import
         alt: "Quảng cáo 2"
     },
     {
-        afterIndex: 8,
-        imageUrl: "banner3.jpg",
+        afterIndex: 8, // Hiện sau mục "Sức khoẻ"
+        imageUrl: banner3, // Sử dụng biến đã import
         alt: "Quảng cáo 3"
     }
 ];
 
-
+// Component hiển thị Banner
 const InterstitialBanner = ({ imageUrl, alt }) => {
     if (!imageUrl) return null;
     return (
@@ -50,9 +55,9 @@ const InterstitialBanner = ({ imageUrl, alt }) => {
             <img
                 src={imageUrl}
                 className="img-fluid w-100 object-fit-cover"
-                style={{ maxHeight: '150px' }} // Giới hạn chiều cao để không quá chiếm chỗ
+                style={{ maxHeight: '150px' }}
                 alt={alt || "Quảng cáo"}
-                onError={(e) => e.target.style.display='none'} // Ẩn nếu lỗi ảnh
+                onError={(e) => e.target.style.display='none'}
             />
         </div>
     );
@@ -67,7 +72,6 @@ function App() {
     const [isCrawling, setIsCrawling] = useState(false);
     const [currentCatName, setCurrentCatName] = useState("Trang chủ");
 
-    // --- HÀM TIỆN ÍCH ---
     const extractImage = (description) => {
         if (!description) return null;
         const imgRegex = /<img[^>]+src="([^">]+)"/g;
@@ -80,12 +84,10 @@ function App() {
         return description.replace(/<[^>]*>?/gm, '').substring(0, 150) + "...";
     };
 
-    // --- LOGIC LẤY RSS CÓ FIX CACHE ---
     const getRSSData = async (url) => {
         try {
             const uniqueUrl = `${url}?t=${new Date().getTime()}`;
             const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(uniqueUrl)}`;
-
             const res = await axios.get(proxyUrl);
             const parser = new XMLParser({ ignoreAttributes: false });
             const result = parser.parse(res.data);
@@ -103,7 +105,6 @@ function App() {
         }
     };
 
-    // --- XỬ LÝ SỰ KIỆN ---
     const fetchRSS = async (url, name) => {
         setLoading(true);
         setCurrentCatName(name);
@@ -144,7 +145,6 @@ function App() {
         }
     };
 
-    // --- EFFECT KHỞI TẠO ---
     useEffect(() => {
         if (CATEGORY_TREE.length > 0) fetchRSS(CATEGORY_TREE[0].url, "Trang chủ");
         const fetchHomeBlocks = async () => {
@@ -158,7 +158,6 @@ function App() {
         fetchHomeBlocks();
     }, []);
 
-    // --- COMPONENT KHỐI TIN ---
     const NewsSection = ({ title, data, onTitleClick }) => {
         if (!data || data.length === 0) return null;
         return (
@@ -253,7 +252,7 @@ function App() {
                     <Col lg={9}>
                         {loading ? (<div className="text-center py-5"><Spinner animation="border" variant="danger" /></div>) : (
                             <>
-                                {/* TOÀN CẢNH - SỰ KIỆN (Chỉ ở trang chủ) */}
+                                {/* TOÀN CẢNH - SỰ KIỆN */}
                                 {currentCatName === "Trang chủ" && articles.length > 0 && (
                                     <div className="mb-5">
                                         <div className="toan-canh-title mb-4 d-flex align-items-center"><h4 className="fw-bold text-danger m-0" style={{ borderBottom: '3px solid #dc3545', paddingBottom: '5px' }}>Toàn cảnh - Sự kiện</h4><span className="flex-grow-1 ms-3 border-bottom"></span></div>
@@ -264,7 +263,7 @@ function App() {
                                     </div>
                                 )}
 
-                                {/* LIST TIN (Khi không ở trang chủ) */}
+                                {/* LIST TIN THƯỜNG */}
                                 {currentCatName !== "Trang chủ" && (
                                     <>
                                         <div className="section-title mb-4 border-bottom pb-2 border-danger border-2"><h5 className="fw-bold text-danger text-uppercase mb-0">{currentCatName}</h5></div>
@@ -276,21 +275,16 @@ function App() {
                                     </>
                                 )}
 
-                                {/* KHỐI DANH MỤC + BANNER XEN KẼ (Chỉ ở trang chủ) */}
+                                {/* KHỐI DANH MỤC + BANNER XEN KẼ */}
                                 {currentCatName === "Trang chủ" && HOME_BLOCKS.map((block, idx) => {
-                                    // Tìm xem có banner nào cần hiện sau khối này không
                                     const bannerToRender = INTERSTITIAL_BANNERS.find(b => b.afterIndex === idx);
-
                                     return (
                                         <React.Fragment key={idx}>
-                                            {/* Hiển thị khối tin tức */}
                                             <NewsSection
                                                 title={block.name}
                                                 data={homeBlockArticles[block.name] || []}
                                                 onTitleClick={() => fetchRSS(block.url, block.name)}
                                             />
-
-                                            {/* Hiển thị banner nếu có */}
                                             {bannerToRender && (
                                                 <InterstitialBanner
                                                     imageUrl={bannerToRender.imageUrl}
@@ -330,7 +324,6 @@ function App() {
                 </Container>
             </footer>
 
-            {/* Modal */}
             <Modal show={!!selectedArticle} onHide={() => setSelectedArticle(null)} size="lg" centered scrollable>
                 <Modal.Header closeButton className="border-0 bg-light"><Modal.Title className="text-danger fw-bold fs-5">{selectedArticle?.title}</Modal.Title></Modal.Header>
                 <Modal.Body className="article-content-body px-4 py-3">{isCrawling ? <div className="text-center py-5"><Spinner animation="grow" variant="danger" /></div> : <div dangerouslySetInnerHTML={{ __html: detailContent }} />}</Modal.Body>
