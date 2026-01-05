@@ -7,10 +7,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
 
-
+// --- IMPORT ẢNH BANNER CÓ SẴN TRONG THƯ MỤC ---
 import banner1 from './banner1.jpg';
 import banner2 from './banner2.jpg';
 import banner3 from './banner3.jpg';
+
+// --- DANH SÁCH 12 KHỐI DANH MỤC HIỂN THỊ Ở TRANG CHỦ ---
 const HOME_BLOCKS = [
     { name: "Giáo dục", url: "https://giaoducthoidai.vn/rss/giao-duc-2.rss" },
     { name: "Thời sự", url: "https://giaoducthoidai.vn/rss/thoi-su-1.rss" },
@@ -29,7 +31,7 @@ const HOME_BLOCKS = [
 
 const INTERSTITIAL_BANNERS = [
     {
-        afterIndex: 1,
+        afterIndex: 3,
         imageUrl: banner1,
         alt: "Quảng cáo 1"
     },
@@ -38,7 +40,6 @@ const INTERSTITIAL_BANNERS = [
         imageUrl: banner2,
         alt: "Quảng cáo 2"
     }
-
 ];
 
 // Component hiển thị Banner
@@ -66,7 +67,6 @@ function App() {
     const [isCrawling, setIsCrawling] = useState(false);
     const [currentCatName, setCurrentCatName] = useState("Trang chủ");
 
-    // --- HÀM TIỆN ÍCH ---
     const extractImage = (description) => {
         if (!description) return null;
         const imgRegex = /<img[^>]+src="([^">]+)"/g;
@@ -247,7 +247,7 @@ function App() {
                     <Col lg={9}>
                         {loading ? (<div className="text-center py-5"><Spinner animation="border" variant="danger" /></div>) : (
                             <>
-                                {/* TOÀN CẢNH - SỰ KIỆN (Chỉ ở trang chủ) */}
+                                {/* Toàn cảnh */}
                                 {currentCatName === "Trang chủ" && articles.length > 0 && (
                                     <div className="mb-5">
                                         <div className="toan-canh-title mb-4 d-flex align-items-center"><h4 className="fw-bold text-danger m-0" style={{ borderBottom: '3px solid #dc3545', paddingBottom: '5px' }}>Toàn cảnh - Sự kiện</h4><span className="flex-grow-1 ms-3 border-bottom"></span></div>
@@ -258,12 +258,12 @@ function App() {
                                     </div>
                                 )}
 
-                                {/* >>> CHÈN BANNER 3 TẠI ĐÂY (NGAY SAU TOÀN CẢNH, TRƯỚC DANH MỤC) <<< */}
+                                {/* BANNER 3 (Ngay sau toàn cảnh) */}
                                 {currentCatName === "Trang chủ" && (
                                     <InterstitialBanner imageUrl={banner3} alt="Quảng cáo nổi bật" />
                                 )}
 
-                                {/* LIST TIN THƯỜNG (Khi không ở trang chủ) */}
+                                {/* List tin thường */}
                                 {currentCatName !== "Trang chủ" && (
                                     <>
                                         <div className="section-title mb-4 border-bottom pb-2 border-danger border-2"><h5 className="fw-bold text-danger text-uppercase mb-0">{currentCatName}</h5></div>
@@ -275,7 +275,7 @@ function App() {
                                     </>
                                 )}
 
-                                {/* KHỐI DANH MỤC + BANNER 1 & 2 XEN KẼ */}
+                                {/* Khối danh mục + Banner xen kẽ */}
                                 {currentCatName === "Trang chủ" && HOME_BLOCKS.map((block, idx) => {
                                     const bannerToRender = INTERSTITIAL_BANNERS.find(b => b.afterIndex === idx);
                                     return (
@@ -307,21 +307,74 @@ function App() {
                 </Row>
             </Container>
 
-            {/* Footer */}
-            <footer className="footer-site mt-5 pt-5 pb-3 text-white" style={{ backgroundColor: '#c92127' }}>
+            {/* --- NEW FOOTER --- */}
+            <footer>
                 <Container>
-                    <Row className="mb-4">
-                        <Col md={5} className="mb-4">
-                            <div className="footer-logo-box bg-white p-2 d-inline-block rounded mb-3"><h3 className="text-danger fw-bold mb-0 lh-1">GIÁO DỤC <span className="text-dark d-block" style={{ fontSize: '0.7rem' }}>VÀ THỜI ĐẠI</span></h3></div>
-                            <p className="small mb-2 fw-bold text-uppercase">Cơ quan của bộ giáo dục và đào tạo</p>
-                            <p className="small opacity-75">Giấy phép số 479/GP-BTTTT cấp ngày 29/10/2020.</p>
-                            <p className="small opacity-75">Tổng biên tập: <strong>Lý Thái Minh Khang</strong></p>
-                        </Col>
-                        <Col md={4} className="mb-4"><h6 className="fw-bold text-uppercase border-bottom border-white border-opacity-25 pb-2 mb-3">Thông tin liên hệ</h6><ul className="list-unstyled small opacity-75 lh-lg"><li><i className="bi bi-geo-alt-fill me-2"></i> Khu phố 6, Thủ Đức, Thành phố Hồ Chí Minh, Việt Nam</li><li><i className="bi bi-telephone-fill me-2"></i> 091.880.3833</li><li><i className="bi bi-envelope-fill me-2"></i> gdtddientu@gmail.com</li></ul></Col>
-                        <Col md={3} className="mb-4 text-center text-md-start"><h6 className="fw-bold text-uppercase border-bottom border-white border-opacity-25 pb-2 mb-3">Mạng xã hội</h6><div className="d-flex justify-content-center justify-content-md-start gap-3 fs-4"><i className="bi bi-facebook cursor-pointer"></i><i className="bi bi-youtube cursor-pointer"></i><i className="bi bi-tiktok cursor-pointer"></i></div></Col>
-                    </Row>
-                    <div className="footer-bottom border-top border-white border-opacity-25 pt-3 text-center small opacity-50"><p>© 2025 Báo Giáo dục và Thời đại. All rights reserved.</p></div>
+                    {/* 1. Footer Nav Bar (Red) */}
+                    <div className="footer-nav-bar d-flex justify-content-center flex-wrap">
+                        <a href="#" className="footer-nav-link">GIÁO DỤC</a>
+                        <a href="#" className="footer-nav-link">THỜI SỰ</a>
+                        <a href="#" className="footer-nav-link">GIÁO DỤC PHÁP LUẬT</a>
+                        <a href="#" className="footer-nav-link">KẾT NỐI</a>
+                        <a href="#" className="footer-nav-link">MEDIA</a>
+                    </div>
+
+                    {/* 2. Tags Area */}
+                    <div className="footer-tags-area text-center">
+                        <a href="#" className="footer-tag-link"><strong>Thi Thử Trắc Nghiệm</strong></a>
+                        <a href="#" className="footer-tag-link">sách đọc online</a>
+                        <a href="#" className="footer-tag-link">The Fullton</a>
+                        <a href="#" className="footer-tag-link"><strong>Woku Shop</strong> - Bản quyền giá tốt</a>
+                        <a href="#" className="footer-tag-link"><strong>cho thuê nhà</strong> tại Chothuenha.me</a>
+                        <a href="#" className="footer-tag-link"><strong>Thuecanho123</strong> - Website cho thuê căn hộ uy tín</a>
+                        <a href="#" className="footer-tag-link">tra cứu điểm</a>
+                        <a href="#" className="footer-tag-link">thời tiết ngày mai</a>
+                        <a href="#" className="footer-tag-link">Sách giáo khoa</a>
+                        <a href="#" className="footer-tag-link">Tìm <strong>bất động sản</strong> tại Bds123.vn</a>
+                        <a href="#" className="footer-tag-link">Tìm <strong>phòng trọ Hồ Chí Minh</strong> tại Phongtro123.com</a>
+                        <a href="#" className="footer-tag-link"><strong>Slice Master</strong> Upgrade Version At Slicemaster.net</a>
+                        <a href="#" className="footer-tag-link"><strong>trần xuyên sáng</strong></a>
+                    </div>
                 </Container>
+
+                {/* 3. Main Footer Info */}
+                <div className="footer-main-info mt-0">
+                    <Container>
+                        <Row>
+                            {/* Cột 1: Logo & Tên báo */}
+                            <Col md={3} className="text-center text-md-start mb-4 mb-md-0">
+                                <div className="footer-logo-text">
+                                    <h2>GIÁO DỤC</h2>
+                                    <h2>VÀ THỜI ĐẠI</h2>
+                                </div>
+                                <div className="footer-logo-sub">BÁO GIÁO DỤC & THỜI ĐẠI</div>
+                            </Col>
+
+                            {/* Cột 2: Thông tin cơ quan */}
+                            <Col md={5} className="mb-4 mb-md-0 footer-info-text">
+                                <p className="mb-2 text-uppercase fw-bold">CƠ QUAN CỦA BỘ GIÁO DỤC VÀ ĐÀO TẠO - DIỄN ĐÀN TOÀN XÃ HỘI VÌ SỰ NGHIỆP GIÁO DỤC</p>
+                                <p className="mb-1">Cơ quan chủ quản: BỘ GIÁO DỤC VÀ ĐÀO TẠO</p>
+                                <p className="mb-1">Số giấy phép: 479/GP-BTTTT, cấp ngày 29/10/2020, ISSN 1859-2945.</p>
+                                <p className="mb-1">Tổng Biên tập: <strong>Triệu Ngọc Lâm</strong></p>
+                                <p className="mb-1">Phó Tổng Biên tập: <strong>Dương Thanh Hương - Nguyễn Đức Tuân</strong></p>
+                                <p className="mb-0">® Ghi rõ nguồn "Báo Giáo dục & Thời đại" khi phát hành lại thông tin từ website.</p>
+                            </Col>
+
+                            {/* Cột 3: Trụ sở & Liên hệ */}
+                            <Col md={4} className="footer-info-text">
+                                <div className="footer-heading">TRỤ SỞ CHÍNH</div>
+                                <p className="mb-1">Tòa soạn: 15 Hai Bà Trưng - P.Cửa Nam - Hà Nội.</p>
+                                <p className="mb-1">Điện thoại: 024 3936 9800</p>
+                                <p className="mb-1">Hotline: 0967 335 089</p>
+                                <p className="mb-3">Email: gdtddientu@gmail.com</p>
+
+                                <div className="footer-heading">LIÊN HỆ QUẢNG CÁO, TRUYỀN THÔNG VÀ ĐẶT BÁO</div>
+                                <p className="mb-1">Phòng Truyền thông và Dự án</p>
+                                <p className="mb-0">Hotline: 0886 059 988</p>
+                            </Col>
+                        </Row>
+                    </Container>
+                </div>
             </footer>
 
             <Modal show={!!selectedArticle} onHide={() => setSelectedArticle(null)} size="lg" centered scrollable>
