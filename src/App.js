@@ -28,7 +28,7 @@ const HOME_BLOCKS = [
     { name: "Thể thao", url: "https://giaoducthoidai.vn/rss/the-thao-12.rss" }
 ];
 
-
+// --- CẤU HÌNH VỊ TRÍ BANNER ---
 const INTERSTITIAL_BANNERS = [
     {
         afterIndex: 3,
@@ -258,7 +258,7 @@ function App() {
                                     </div>
                                 )}
 
-                                {/* BANNER 3 (Ngay sau toàn cảnh) */}
+                                {/* BANNER 3 */}
                                 {currentCatName === "Trang chủ" && (
                                     <InterstitialBanner imageUrl={banner3} alt="Quảng cáo nổi bật" />
                                 )}
@@ -307,7 +307,7 @@ function App() {
                 </Row>
             </Container>
 
-            {/* --- NEW FOOTER --- */}
+            {/* --- NEW FOOTER START --- */}
             <footer>
                 <Container>
                     {/* 1. Footer Nav Bar (Red) */}
@@ -319,7 +319,7 @@ function App() {
                         <a href="#" className="footer-nav-link">MEDIA</a>
                     </div>
 
-                    {/* 2. Tags Area */}
+                    {/* 2. Tags Area (White) */}
                     <div className="footer-tags-area text-center">
                         <a href="#" className="footer-tag-link"><strong>Thi Thử Trắc Nghiệm</strong></a>
                         <a href="#" className="footer-tag-link">sách đọc online</a>
@@ -337,22 +337,22 @@ function App() {
                     </div>
                 </Container>
 
-                {/* 3. Main Footer Info */}
+                {/* 3. Main Footer Info (Dark Red) */}
                 <div className="footer-main-info mt-0">
                     <Container>
                         <Row>
                             {/* Cột 1: Logo & Tên báo */}
                             <Col md={3} className="text-center text-md-start mb-4 mb-md-0">
-                                <div className="footer-logo-text">
+                                <div className="footer-logo-text text-center">
                                     <h2>GIÁO DỤC</h2>
                                     <h2>VÀ THỜI ĐẠI</h2>
                                 </div>
-                                <div className="footer-logo-sub">BÁO GIÁO DỤC & THỜI ĐẠI</div>
+                                <div className="footer-logo-sub text-center">BÁO GIÁO DỤC & THỜI ĐẠI</div>
                             </Col>
 
                             {/* Cột 2: Thông tin cơ quan */}
                             <Col md={5} className="mb-4 mb-md-0 footer-info-text">
-                                <p className="mb-2 text-uppercase fw-bold">CƠ QUAN CỦA BỘ GIÁO DỤC VÀ ĐÀO TẠO - DIỄN ĐÀN TOÀN XÃ HỘI VÌ SỰ NGHIỆP GIÁO DỤC</p>
+                                <p className="mb-2 fw-bold text-uppercase">CƠ QUAN CỦA BỘ GIÁO DỤC VÀ ĐÀO TẠO - DIỄN ĐÀN TOÀN XÃ HỘI VÌ SỰ NGHIỆP GIÁO DỤC</p>
                                 <p className="mb-1">Cơ quan chủ quản: BỘ GIÁO DỤC VÀ ĐÀO TẠO</p>
                                 <p className="mb-1">Số giấy phép: 479/GP-BTTTT, cấp ngày 29/10/2020, ISSN 1859-2945.</p>
                                 <p className="mb-1">Tổng Biên tập: <strong>Triệu Ngọc Lâm</strong></p>
@@ -374,8 +374,14 @@ function App() {
                             </Col>
                         </Row>
                     </Container>
+
+                    {/* Dòng bản quyền cuối cùng */}
+                    <div className="footer-bottom text-center small opacity-75 mt-3 pt-2 border-top border-white border-opacity-25">
+                        <p className="m-0">© 2025 Báo Giáo dục và Thời đại. All rights reserved.</p>
+                    </div>
                 </div>
             </footer>
+            {/* --- NEW FOOTER END --- */}
 
             <Modal show={!!selectedArticle} onHide={() => setSelectedArticle(null)} size="lg" centered scrollable>
                 <Modal.Header closeButton className="border-0 bg-light"><Modal.Title className="text-danger fw-bold fs-5">{selectedArticle?.title}</Modal.Title></Modal.Header>
