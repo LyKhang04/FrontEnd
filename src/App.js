@@ -7,44 +7,38 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
 
-// --- IMPORT ẢNH BANNER CÓ SẴN TRONG THƯ MỤC ---
+
 import banner1 from './banner1.jpg';
 import banner2 from './banner2.jpg';
 import banner3 from './banner3.jpg';
-
-// --- DANH SÁCH 12 KHỐI DANH MỤC HIỂN THỊ Ở TRANG CHỦ ---
 const HOME_BLOCKS = [
-    { name: "Giáo dục", url: "https://giaoducthoidai.vn/rss/giao-duc-2.rss" }, // index 0
-    { name: "Thời sự", url: "https://giaoducthoidai.vn/rss/thoi-su-1.rss" },   // index 1
+    { name: "Giáo dục", url: "https://giaoducthoidai.vn/rss/giao-duc-2.rss" },
+    { name: "Thời sự", url: "https://giaoducthoidai.vn/rss/thoi-su-1.rss" },
     { name: "Giáo dục pháp luật", url: "https://giaoducthoidai.vn/rss/phap-luat-5.rss" },
     { name: "Kết nối", url: "https://giaoducthoidai.vn/rss/dong-hanh-37.rss" },
-    { name: "Trao đổi", url: "https://giaoducthoidai.vn/rss/goc-nhin-7.rss" }, // index 4
+    { name: "Trao đổi", url: "https://giaoducthoidai.vn/rss/goc-nhin-7.rss" },
     { name: "Học đường", url: "https://giaoducthoidai.vn/rss/hoc-duong-14.rss" },
     { name: "Nhân ái", url: "https://giaoducthoidai.vn/rss/nhan-ai-23.rss" },
     { name: "Thế giới", url: "https://giaoducthoidai.vn/rss/the-gioi-10.rss" },
-    { name: "Sức khoẻ", url: "https://giaoducthoidai.vn/rss/suc-khoe-19.rss" }, // index 8
+    { name: "Sức khoẻ", url: "https://giaoducthoidai.vn/rss/suc-khoe-19.rss" },
     { name: "Media", url: "https://giaoducthoidai.vn/rss/video-media-11.rss" },
     { name: "Văn hóa", url: "https://giaoducthoidai.vn/rss/van-hoa-8.rss" },
     { name: "Thể thao", url: "https://giaoducthoidai.vn/rss/the-thao-12.rss" }
 ];
 
-// --- CẤU HÌNH VỊ TRÍ BANNER ---
+
 const INTERSTITIAL_BANNERS = [
     {
-        afterIndex: 1, // Hiện sau mục "Thời sự"
-        imageUrl: banner1, // Sử dụng biến đã import
+        afterIndex: 1,
+        imageUrl: banner1,
         alt: "Quảng cáo 1"
     },
     {
-        afterIndex: 4, // Hiện sau mục "Trao đổi"
-        imageUrl: banner2, // Sử dụng biến đã import
+        afterIndex: 4,
+        imageUrl: banner2,
         alt: "Quảng cáo 2"
-    },
-    {
-        afterIndex: 8, // Hiện sau mục "Sức khoẻ"
-        imageUrl: banner3, // Sử dụng biến đã import
-        alt: "Quảng cáo 3"
     }
+
 ];
 
 // Component hiển thị Banner
@@ -72,6 +66,7 @@ function App() {
     const [isCrawling, setIsCrawling] = useState(false);
     const [currentCatName, setCurrentCatName] = useState("Trang chủ");
 
+    // --- HÀM TIỆN ÍCH ---
     const extractImage = (description) => {
         if (!description) return null;
         const imgRegex = /<img[^>]+src="([^">]+)"/g;
@@ -252,7 +247,7 @@ function App() {
                     <Col lg={9}>
                         {loading ? (<div className="text-center py-5"><Spinner animation="border" variant="danger" /></div>) : (
                             <>
-                                {/* TOÀN CẢNH - SỰ KIỆN */}
+                                {/* TOÀN CẢNH - SỰ KIỆN (Chỉ ở trang chủ) */}
                                 {currentCatName === "Trang chủ" && articles.length > 0 && (
                                     <div className="mb-5">
                                         <div className="toan-canh-title mb-4 d-flex align-items-center"><h4 className="fw-bold text-danger m-0" style={{ borderBottom: '3px solid #dc3545', paddingBottom: '5px' }}>Toàn cảnh - Sự kiện</h4><span className="flex-grow-1 ms-3 border-bottom"></span></div>
@@ -263,7 +258,12 @@ function App() {
                                     </div>
                                 )}
 
-                                {/* LIST TIN THƯỜNG */}
+                                {/* >>> CHÈN BANNER 3 TẠI ĐÂY (NGAY SAU TOÀN CẢNH, TRƯỚC DANH MỤC) <<< */}
+                                {currentCatName === "Trang chủ" && (
+                                    <InterstitialBanner imageUrl={banner3} alt="Quảng cáo nổi bật" />
+                                )}
+
+                                {/* LIST TIN THƯỜNG (Khi không ở trang chủ) */}
                                 {currentCatName !== "Trang chủ" && (
                                     <>
                                         <div className="section-title mb-4 border-bottom pb-2 border-danger border-2"><h5 className="fw-bold text-danger text-uppercase mb-0">{currentCatName}</h5></div>
@@ -275,7 +275,7 @@ function App() {
                                     </>
                                 )}
 
-                                {/* KHỐI DANH MỤC + BANNER XEN KẼ */}
+                                {/* KHỐI DANH MỤC + BANNER 1 & 2 XEN KẼ */}
                                 {currentCatName === "Trang chủ" && HOME_BLOCKS.map((block, idx) => {
                                     const bannerToRender = INTERSTITIAL_BANNERS.find(b => b.afterIndex === idx);
                                     return (
