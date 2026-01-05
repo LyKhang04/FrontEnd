@@ -7,12 +7,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
 
-// --- IMPORT ẢNH BANNER CÓ SẴN TRONG THƯ MỤC ---
+
 import banner1 from './banner1.jpg';
 import banner2 from './banner2.jpg';
 import banner3 from './banner3.jpg';
+import banner from './banner.jpg';
 
-// --- DANH SÁCH 12 KHỐI DANH MỤC HIỂN THỊ Ở TRANG CHỦ ---
 const HOME_BLOCKS = [
     { name: "Giáo dục", url: "https://giaoducthoidai.vn/rss/giao-duc-2.rss" },
     { name: "Thời sự", url: "https://giaoducthoidai.vn/rss/thoi-su-1.rss" },
@@ -28,7 +28,6 @@ const HOME_BLOCKS = [
     { name: "Thể thao", url: "https://giaoducthoidai.vn/rss/the-thao-12.rss" }
 ];
 
-// --- CẤU HÌNH VỊ TRÍ BANNER ---
 const INTERSTITIAL_BANNERS = [
     {
         afterIndex: 3,
@@ -43,14 +42,14 @@ const INTERSTITIAL_BANNERS = [
 ];
 
 // Component hiển thị Banner
-const InterstitialBanner = ({ imageUrl, alt }) => {
+const InterstitialBanner = ({ imageUrl, alt, className }) => {
     if (!imageUrl) return null;
     return (
-        <div className="interstitial-banner mb-5 rounded overflow-hidden shadow-sm text-center">
+        <div className={`interstitial-banner rounded overflow-hidden shadow-sm text-center ${className}`}>
             <img
                 src={imageUrl}
                 className="img-fluid w-100 object-fit-cover"
-                style={{ maxHeight: '150px' }}
+                // style={{ maxHeight: '150px' }} // Bỏ giới hạn chiều cao để banner cuối to hơn
                 alt={alt || "Quảng cáo"}
                 onError={(e) => e.target.style.display='none'}
             />
@@ -194,7 +193,7 @@ function App() {
 
     return (
         <div className="app-container">
-            {/* Top Bar */}
+
             <div className="top-info-bar bg-light border-bottom py-1">
                 <Container className="d-flex justify-content-start align-items-center small text-secondary">
                     <span className="me-3"><i className="bi bi-clock me-1"></i> {new Date().toLocaleDateString('vi-VN')}</span>
@@ -203,7 +202,7 @@ function App() {
                 </Container>
             </div>
 
-            {/* Header */}
+
             <header className="bg-white py-3">
                 <Container className="d-flex justify-content-between align-items-center flex-wrap">
                     <div className="logo-box cursor-pointer" onClick={() => fetchRSS(CATEGORY_TREE[0].url, "Trang chủ")}>
@@ -220,7 +219,7 @@ function App() {
                 </Container>
             </header>
 
-            {/* Navbar */}
+
             <Navbar bg="danger" variant="dark" expand="lg" className="py-0 sticky-top main-nav shadow-sm">
                 <Container>
                     <Navbar.Toggle aria-controls="main-navbar" />
@@ -241,13 +240,13 @@ function App() {
                 </Container>
             </Navbar>
 
-            {/* Main Content */}
+
             <Container className="mt-4">
                 <Row>
                     <Col lg={9}>
                         {loading ? (<div className="text-center py-5"><Spinner animation="border" variant="danger" /></div>) : (
                             <>
-                                {/* Toàn cảnh */}
+
                                 {currentCatName === "Trang chủ" && articles.length > 0 && (
                                     <div className="mb-5">
                                         <div className="toan-canh-title mb-4 d-flex align-items-center"><h4 className="fw-bold text-danger m-0" style={{ borderBottom: '3px solid #dc3545', paddingBottom: '5px' }}>Toàn cảnh - Sự kiện</h4><span className="flex-grow-1 ms-3 border-bottom"></span></div>
@@ -258,12 +257,10 @@ function App() {
                                     </div>
                                 )}
 
-                                {/* BANNER 3 */}
                                 {currentCatName === "Trang chủ" && (
                                     <InterstitialBanner imageUrl={banner3} alt="Quảng cáo nổi bật" />
                                 )}
 
-                                {/* List tin thường */}
                                 {currentCatName !== "Trang chủ" && (
                                     <>
                                         <div className="section-title mb-4 border-bottom pb-2 border-danger border-2"><h5 className="fw-bold text-danger text-uppercase mb-0">{currentCatName}</h5></div>
@@ -275,7 +272,7 @@ function App() {
                                     </>
                                 )}
 
-                                {/* Khối danh mục + Banner xen kẽ */}
+
                                 {currentCatName === "Trang chủ" && HOME_BLOCKS.map((block, idx) => {
                                     const bannerToRender = INTERSTITIAL_BANNERS.find(b => b.afterIndex === idx);
                                     return (
@@ -289,6 +286,7 @@ function App() {
                                                 <InterstitialBanner
                                                     imageUrl={bannerToRender.imageUrl}
                                                     alt={bannerToRender.alt}
+                                                    className="mb-5" // Thêm margin bottom cho banner
                                                 />
                                             )}
                                         </React.Fragment>
@@ -298,19 +296,28 @@ function App() {
                         )}
                     </Col>
 
-                    {/* Sidebar */}
+
                     <Col lg={3}>
                         <div className="sidebar-box mb-4"><div className="sidebar-header bg-danger text-white p-2 fw-bold text-uppercase mb-0"><i className="bi bi-star-fill me-2 text-warning"></i> Mới cập nhật</div><div className="sidebar-content border border-top-0 p-2 bg-white" style={{maxHeight: '500px', overflowY: 'auto'}}>{articles.slice(6, 15).map((item, idx) => (<div key={idx} className="mb-2 pb-2 border-bottom cursor-pointer" onClick={() => crawlArticle(item)}><h6 className="fw-bold small hover-blue mb-1">{item.title}</h6><span className="text-muted" style={{ fontSize: '0.7rem' }}>Vừa xong</span></div>))}</div></div>
                         <div className="sidebar-box mb-4"><div className="sidebar-header p-2 fw-bold text-uppercase mb-0 border-start border-5 border-danger text-danger bg-light">SUY NGẪM</div><div className="sidebar-content p-3 bg-light"><h6 className="fw-bold mb-2">Sắp nhập trường cao đẳng sư phạm: Tất yếu của đổi mới</h6><p className="small text-muted mb-0">GD&TĐ - Việc sáp nhập các trường cao đẳng sư phạm là xu thế tất yếu nhằm nâng cao chất lượng...</p></div></div>
                         <div className="baoin-banner text-center text-white p-4 rounded shadow-sm d-flex flex-column align-items-center justify-content-center cursor-pointer mb-4"><i className="bi bi-newspaper fs-1 mb-2"></i><h5 className="fw-bold mb-0">ĐỌC BÁO IN</h5><h5 className="fw-bold">ONLINE</h5></div>
                     </Col>
                 </Row>
+
+
+                {currentCatName === "Trang chủ" && (
+                    <div className="banner-bottom-large mb-5 mt-4">
+                        <InterstitialBanner imageUrl={banner} alt="Banner cuối trang" />
+
+                    </div>
+                )}
+
             </Container>
 
-            {/* --- NEW FOOTER START --- */}
-            <footer>
+            {/* Footer */}
+            <footer className="footer-site mt-0 pt-0 pb-3 text-white">
                 <Container>
-                    {/* 1. Footer Nav Bar (Red) */}
+
                     <div className="footer-nav-bar d-flex justify-content-center flex-wrap">
                         <a href="#" className="footer-nav-link">GIÁO DỤC</a>
                         <a href="#" className="footer-nav-link">THỜI SỰ</a>
@@ -319,7 +326,7 @@ function App() {
                         <a href="#" className="footer-nav-link">MEDIA</a>
                     </div>
 
-                    {/* 2. Tags Area (White) */}
+
                     <div className="footer-tags-area text-center">
                         <a href="#" className="footer-tag-link"><strong>Thi Thử Trắc Nghiệm</strong></a>
                         <a href="#" className="footer-tag-link">sách đọc online</a>
@@ -337,11 +344,11 @@ function App() {
                     </div>
                 </Container>
 
-                {/* 3. Main Footer Info (Dark Red) */}
+
                 <div className="footer-main-info mt-0">
                     <Container>
                         <Row>
-                            {/* Cột 1: Logo & Tên báo */}
+
                             <Col md={3} className="text-center text-md-start mb-4 mb-md-0">
                                 <div className="footer-logo-text text-center">
                                     <h2>GIÁO DỤC</h2>
@@ -350,7 +357,7 @@ function App() {
                                 <div className="footer-logo-sub text-center">BÁO GIÁO DỤC & THỜI ĐẠI</div>
                             </Col>
 
-                            {/* Cột 2: Thông tin cơ quan */}
+
                             <Col md={5} className="mb-4 mb-md-0 footer-info-text">
                                 <p className="mb-2 fw-bold text-uppercase">CƠ QUAN CỦA BỘ GIÁO DỤC VÀ ĐÀO TẠO - DIỄN ĐÀN TOÀN XÃ HỘI VÌ SỰ NGHIỆP GIÁO DỤC</p>
                                 <p className="mb-1">Cơ quan chủ quản: BỘ GIÁO DỤC VÀ ĐÀO TẠO</p>
@@ -360,7 +367,7 @@ function App() {
                                 <p className="mb-0">® Ghi rõ nguồn "Báo Giáo dục & Thời đại" khi phát hành lại thông tin từ website.</p>
                             </Col>
 
-                            {/* Cột 3: Trụ sở & Liên hệ */}
+
                             <Col md={4} className="footer-info-text">
                                 <div className="footer-heading">TRỤ SỞ CHÍNH</div>
                                 <p className="mb-1">Tòa soạn: 15 Hai Bà Trưng - P.Cửa Nam - Hà Nội.</p>
@@ -375,13 +382,12 @@ function App() {
                         </Row>
                     </Container>
 
-                    {/* Dòng bản quyền cuối cùng */}
+
                     <div className="footer-bottom text-center small opacity-75 mt-3 pt-2 border-top border-white border-opacity-25">
                         <p className="m-0">© 2025 Báo Giáo dục và Thời đại. All rights reserved.</p>
                     </div>
                 </div>
             </footer>
-            {/* --- NEW FOOTER END --- */}
 
             <Modal show={!!selectedArticle} onHide={() => setSelectedArticle(null)} size="lg" centered scrollable>
                 <Modal.Header closeButton className="border-0 bg-light"><Modal.Title className="text-danger fw-bold fs-5">{selectedArticle?.title}</Modal.Title></Modal.Header>
