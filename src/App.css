@@ -121,9 +121,6 @@
     margin-bottom: 5px;
 }
 
-/* --- FOOTER MỚI (CHUẨN THIẾT KẾ) --- */
-
-/* 1. Thanh Menu đỏ bo góc trên cùng */
 .footer-nav-bar {
     background-color: #c92127;
     border-top-left-radius: 12px;
@@ -144,7 +141,7 @@
     transition: all 0.3s ease;
 }
 
-/* Đường gạch ngăn cách giữa các link */
+
 .footer-nav-link:not(:last-child)::after {
     content: "";
     position: absolute;
@@ -157,14 +154,14 @@
 }
 
 .footer-nav-link:hover {
-    color: #ffeb3b; /* Vàng sáng khi hover */
+    color: #ffeb3b;
 }
 
-/* 2. Khu vực từ khóa (Tags) */
+
 .footer-tags-area {
     background-color: #fff;
     border: 1px solid #e5e5e5;
-    border-top: none; /* Liền mạch với thanh đỏ ở trên */
+    border-top: none;
     padding: 20px 30px;
     font-size: 0.85rem;
     line-height: 1.8;
@@ -189,16 +186,16 @@
     text-decoration: underline;
 }
 
-/* 3. Phần thông tin chính (Màu đỏ đậm) */
+
 .footer-main-info {
-    background-color: #c92127; /* Màu đỏ chủ đạo */
+    background-color: #c92127;
     color: white;
     padding-top: 45px;
     padding-bottom: 25px;
     border-top: 1px solid rgba(0,0,0,0.1);
 }
 
-/* Style Logo chữ */
+
 .footer-logo-text {
     border: 2px solid white;
     display: inline-block;
@@ -236,7 +233,7 @@
     margin-bottom: 8px;
     font-size: 0.9rem;
     margin-top: 15px;
-    color: #ffeb3b; /* Tiêu đề con màu vàng */
+    color: #ffeb3b;
 }
 
 .footer-heading:first-child {
@@ -244,7 +241,7 @@
 }
 
 .footer-bottom {
-    background-color: #a01a1f; /* Màu đỏ đậm hơn cho dòng bản quyền cuối */
+    background-color: #a01a1f;
     padding: 10px 0;
     margin-top: 20px;
 }
