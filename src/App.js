@@ -11,7 +11,6 @@ import './App.css';
 import banner1 from './banner1.jpg';
 import banner2 from './banner2.jpg';
 import banner3 from './banner3.jpg';
-import banner from './banner.jpg';
 
 const HOME_BLOCKS = [
     { name: "Giáo dục", url: "https://giaoducthoidai.vn/rss/giao-duc-2.rss" },
@@ -29,38 +28,56 @@ const HOME_BLOCKS = [
 ];
 
 const INTERSTITIAL_BANNERS = [
-    {
-        afterIndex: 3,
-        imageUrl: banner1,
-        alt: "Quảng cáo 1"
-    },
-    {
-        afterIndex: 4,
-        imageUrl: banner2,
-        alt: "Quảng cáo 2"
-    }
+    { afterIndex: 3, imageUrl: banner1, alt: "Quảng cáo 1" },
+    { afterIndex: 6, imageUrl: banner2, alt: "Quảng cáo 2" }
 ];
 
-// Component hiển thị Banner
+// --- COMPONENT SKELETON (HIỆN KHI ĐANG TẢI) ---
+const NewsBlockSkeleton = ({ title }) => (
+    <div className="news-section-block mb-5">
+        <div className="d-flex justify-content-between align-items-center border-bottom border-danger border-2 mb-3">
+            <h4 className="section-header-title text-danger fw-bold mb-0 text-uppercase py-1">{title}</h4>
+        </div>
+        <Row>
+            <Col md={7}>
+                <div className="border-0 shadow-sm h-100 card">
+                    <div className="ratio ratio-16x9 skeleton mb-2"></div>
+                    <div className="p-3">
+                        <div className="skeleton skeleton-title"></div>
+                        <div className="skeleton skeleton-text"></div>
+                        <div className="skeleton skeleton-text w-75"></div>
+                    </div>
+                </div>
+            </Col>
+            <Col md={5}>
+                {[1, 2, 3, 4].map((_, idx) => (
+                    <div key={idx} className="d-flex mb-3 pb-3 border-bottom align-items-start">
+                        <div className="flex-shrink-0 ratio ratio-1x1 rounded me-3 skeleton" style={{ width: '90px' }}></div>
+                        <div className="flex-grow-1">
+                            <div className="skeleton skeleton-text"></div>
+                            <div className="skeleton skeleton-text w-50"></div>
+                        </div>
+                    </div>
+                ))}
+            </Col>
+        </Row>
+    </div>
+);
+
+
 const InterstitialBanner = ({ imageUrl, alt, className }) => {
     if (!imageUrl) return null;
     return (
         <div className={`interstitial-banner rounded overflow-hidden shadow-sm text-center ${className}`}>
-            <img
-                src={imageUrl}
-                className="img-fluid w-100 object-fit-cover"
-                // style={{ maxHeight: '150px' }} // Bỏ giới hạn chiều cao để banner cuối to hơn
-                alt={alt || "Quảng cáo"}
-                onError={(e) => e.target.style.display='none'}
-            />
+            <img src={imageUrl} className="img-fluid w-100 object-fit-cover" alt={alt || "Quảng cáo"} onError={(e) => e.target.style.display='none'} />
         </div>
     );
 };
 
 function App() {
     const [articles, setArticles] = useState([]);
-    const [homeBlockArticles, setHomeBlockArticles] = useState({});
-    const [loading, setLoading] = useState(false);
+    const [homeBlockArticles, setHomeBlockArticles] = useState({}); // Lưu trữ data từng block
+    const [loading, setLoading] = useState(false); // Loading cho trang chi tiết
     const [selectedArticle, setSelectedArticle] = useState(null);
     const [detailContent, setDetailContent] = useState("");
     const [isCrawling, setIsCrawling] = useState(false);
@@ -87,7 +104,6 @@ function App() {
             const result = parser.parse(res.data);
             let items = result?.rss?.channel?.item;
             items = Array.isArray(items) ? items : (items ? [items] : []);
-
             return items.map(item => ({
                 ...item,
                 imageUrl: extractImage(item.description),
@@ -99,16 +115,35 @@ function App() {
         }
     };
 
+    // --- LOGIC TẢI DỮ LIỆU TỪNG PHẦN (CẢI TIẾN) ---
+    useEffect(() => {
+        // 1. Tải trang chủ (Main feed)
+        const fetchMainFeed = async () => {
+            setLoading(true);
+            const data = await getRSSData(CATEGORY_TREE[0].url);
+            setArticles(data);
+            setLoading(false);
+        };
+        fetchMainFeed();
+
+        // 2. Tải các khối danh mục ĐỘC LẬP (Không đợi nhau)
+        HOME_BLOCKS.forEach(async (block) => {
+            const items = await getRSSData(block.url);
+            setHomeBlockArticles(prev => ({
+                ...prev,
+                [block.name]: items // Cập nhật ngay khi khối này tải xong
+            }));
+        });
+    }, []);
+
     const fetchRSS = async (url, name) => {
         setLoading(true);
         setCurrentCatName(name);
         setArticles([]);
-        setTimeout(async () => {
-            const data = await getRSSData(url);
-            setArticles(data);
-            setLoading(false);
-            window.scrollTo(0, 0);
-        }, 300);
+        const data = await getRSSData(url);
+        setArticles(data);
+        setLoading(false);
+        window.scrollTo(0, 0);
     };
 
     const crawlArticle = async (article) => {
@@ -120,7 +155,6 @@ function App() {
             const res = await axios.get(proxyUrl);
             const dom = new DOMParser().parseFromString(res.data, 'text/html');
             const content = dom.querySelector('.detail-content') || dom.querySelector('article') || dom.querySelector('.content');
-
             if (content) {
                 content.querySelectorAll('img').forEach(img => {
                     img.className = "img-fluid rounded shadow-sm my-3 d-block mx-auto";
@@ -139,21 +173,12 @@ function App() {
         }
     };
 
-    useEffect(() => {
-        if (CATEGORY_TREE.length > 0) fetchRSS(CATEGORY_TREE[0].url, "Trang chủ");
-        const fetchHomeBlocks = async () => {
-            const blockData = {};
-            await Promise.all(HOME_BLOCKS.map(async (block) => {
-                const items = await getRSSData(block.url);
-                blockData[block.name] = items.slice(0, 5);
-            }));
-            setHomeBlockArticles(blockData);
-        };
-        fetchHomeBlocks();
-    }, []);
-
     const NewsSection = ({ title, data, onTitleClick }) => {
-        if (!data || data.length === 0) return null;
+
+        if (!data) {
+            return <NewsBlockSkeleton title={title} />;
+        }
+        if (data.length === 0) return null;
         return (
             <div className="news-section-block mb-5">
                 <div className="d-flex justify-content-between align-items-center border-bottom border-danger border-2 mb-3">
@@ -193,7 +218,6 @@ function App() {
 
     return (
         <div className="app-container">
-
             <div className="top-info-bar bg-light border-bottom py-1">
                 <Container className="d-flex justify-content-start align-items-center small text-secondary">
                     <span className="me-3"><i className="bi bi-clock me-1"></i> {new Date().toLocaleDateString('vi-VN')}</span>
@@ -201,7 +225,6 @@ function App() {
                     <span className="border-start ps-3">Email: gdtddientu@gmail.com</span>
                 </Container>
             </div>
-
 
             <header className="bg-white py-3">
                 <Container className="d-flex justify-content-between align-items-center flex-wrap">
@@ -218,7 +241,6 @@ function App() {
                     </div>
                 </Container>
             </header>
-
 
             <Navbar bg="danger" variant="dark" expand="lg" className="py-0 sticky-top main-nav shadow-sm">
                 <Container>
@@ -240,13 +262,12 @@ function App() {
                 </Container>
             </Navbar>
 
-
             <Container className="mt-4">
                 <Row>
                     <Col lg={9}>
                         {loading ? (<div className="text-center py-5"><Spinner animation="border" variant="danger" /></div>) : (
                             <>
-
+                                {/* Toàn cảnh */}
                                 {currentCatName === "Trang chủ" && articles.length > 0 && (
                                     <div className="mb-5">
                                         <div className="toan-canh-title mb-4 d-flex align-items-center"><h4 className="fw-bold text-danger m-0" style={{ borderBottom: '3px solid #dc3545', paddingBottom: '5px' }}>Toàn cảnh - Sự kiện</h4><span className="flex-grow-1 ms-3 border-bottom"></span></div>
@@ -261,6 +282,7 @@ function App() {
                                     <InterstitialBanner imageUrl={banner3} alt="Quảng cáo nổi bật" />
                                 )}
 
+                                {/* List tin thường (Không ở trang chủ) */}
                                 {currentCatName !== "Trang chủ" && (
                                     <>
                                         <div className="section-title mb-4 border-bottom pb-2 border-danger border-2"><h5 className="fw-bold text-danger text-uppercase mb-0">{currentCatName}</h5></div>
@@ -279,14 +301,15 @@ function App() {
                                         <React.Fragment key={idx}>
                                             <NewsSection
                                                 title={block.name}
-                                                data={homeBlockArticles[block.name] || []}
+                                                // Lấy dữ liệu từ state theo tên block. Nếu chưa có -> undefined -> sẽ hiện Skeleton
+                                                data={homeBlockArticles[block.name]}
                                                 onTitleClick={() => fetchRSS(block.url, block.name)}
                                             />
                                             {bannerToRender && (
                                                 <InterstitialBanner
                                                     imageUrl={bannerToRender.imageUrl}
                                                     alt={bannerToRender.alt}
-                                                    className="mb-5" // Thêm margin bottom cho banner
+                                                    className="mb-5"
                                                 />
                                             )}
                                         </React.Fragment>
@@ -303,21 +326,11 @@ function App() {
                         <div className="baoin-banner text-center text-white p-4 rounded shadow-sm d-flex flex-column align-items-center justify-content-center cursor-pointer mb-4"><i className="bi bi-newspaper fs-1 mb-2"></i><h5 className="fw-bold mb-0">ĐỌC BÁO IN</h5><h5 className="fw-bold">ONLINE</h5></div>
                     </Col>
                 </Row>
-
-
-                {currentCatName === "Trang chủ" && (
-                    <div className="banner-bottom-large mb-5 mt-4">
-                        <InterstitialBanner imageUrl={banner} alt="Banner cuối trang" />
-
-                    </div>
-                )}
-
             </Container>
 
             {/* Footer */}
             <footer className="footer-site mt-0 pt-0 pb-3 text-white">
                 <Container>
-
                     <div className="footer-nav-bar d-flex justify-content-center flex-wrap">
                         <a href="#" className="footer-nav-link">GIÁO DỤC</a>
                         <a href="#" className="footer-nav-link">THỜI SỰ</a>
@@ -325,8 +338,6 @@ function App() {
                         <a href="#" className="footer-nav-link">KẾT NỐI</a>
                         <a href="#" className="footer-nav-link">MEDIA</a>
                     </div>
-
-
                     <div className="footer-tags-area text-center">
                         <a href="#" className="footer-tag-link"><strong>Thi Thử Trắc Nghiệm</strong></a>
                         <a href="#" className="footer-tag-link">sách đọc online</a>
@@ -343,12 +354,9 @@ function App() {
                         <a href="#" className="footer-tag-link"><strong>trần xuyên sáng</strong></a>
                     </div>
                 </Container>
-
-
                 <div className="footer-main-info mt-0">
                     <Container>
                         <Row>
-
                             <Col md={3} className="text-center text-md-start mb-4 mb-md-0">
                                 <div className="footer-logo-text text-center">
                                     <h2>GIÁO DỤC</h2>
@@ -356,8 +364,6 @@ function App() {
                                 </div>
                                 <div className="footer-logo-sub text-center">BÁO GIÁO DỤC & THỜI ĐẠI</div>
                             </Col>
-
-
                             <Col md={5} className="mb-4 mb-md-0 footer-info-text">
                                 <p className="mb-2 fw-bold text-uppercase">CƠ QUAN CỦA BỘ GIÁO DỤC VÀ ĐÀO TẠO - DIỄN ĐÀN TOÀN XÃ HỘI VÌ SỰ NGHIỆP GIÁO DỤC</p>
                                 <p className="mb-1">Cơ quan chủ quản: BỘ GIÁO DỤC VÀ ĐÀO TẠO</p>
@@ -366,23 +372,18 @@ function App() {
                                 <p className="mb-1">Phó Tổng Biên tập: <strong>Dương Thanh Hương - Nguyễn Đức Tuân</strong></p>
                                 <p className="mb-0">® Ghi rõ nguồn "Báo Giáo dục & Thời đại" khi phát hành lại thông tin từ website.</p>
                             </Col>
-
-
                             <Col md={4} className="footer-info-text">
                                 <div className="footer-heading">TRỤ SỞ CHÍNH</div>
                                 <p className="mb-1">Tòa soạn: 15 Hai Bà Trưng - P.Cửa Nam - Hà Nội.</p>
                                 <p className="mb-1">Điện thoại: 024 3936 9800</p>
                                 <p className="mb-1">Hotline: 0967 335 089</p>
                                 <p className="mb-3">Email: gdtddientu@gmail.com</p>
-
                                 <div className="footer-heading">LIÊN HỆ QUẢNG CÁO, TRUYỀN THÔNG VÀ ĐẶT BÁO</div>
                                 <p className="mb-1">Phòng Truyền thông và Dự án</p>
                                 <p className="mb-0">Hotline: 0886 059 988</p>
                             </Col>
                         </Row>
                     </Container>
-
-
                     <div className="footer-bottom text-center small opacity-75 mt-3 pt-2 border-top border-white border-opacity-25">
                         <p className="m-0">© 2025 Báo Giáo dục và Thời đại. All rights reserved.</p>
                     </div>
