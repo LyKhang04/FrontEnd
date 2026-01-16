@@ -7,7 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
 
-
+// --- IMPORT ẢNH BANNER ---
 import banner1 from './banner1.jpg';
 import banner2 from './banner2.jpg';
 import banner3 from './banner3.jpg';
@@ -28,11 +28,11 @@ const HOME_BLOCKS = [
 ];
 
 const INTERSTITIAL_BANNERS = [
-    { afterIndex: 3, imageUrl: banner1, alt: "Quảng cáo 1" },
-    { afterIndex: 6, imageUrl: banner2, alt: "Quảng cáo 2" }
+    { afterIndex: 1, imageUrl: banner1, alt: "Quảng cáo 1" },
+    { afterIndex: 4, imageUrl: banner2, alt: "Quảng cáo 2" }
 ];
 
-// --- COMPONENT SKELETON (HIỆN KHI ĐANG TẢI) ---
+// --- COMPONENT SKELETON ---
 const NewsBlockSkeleton = ({ title }) => (
     <div className="news-section-block mb-5">
         <div className="d-flex justify-content-between align-items-center border-bottom border-danger border-2 mb-3">
@@ -64,7 +64,7 @@ const NewsBlockSkeleton = ({ title }) => (
     </div>
 );
 
-
+// Component Banner
 const InterstitialBanner = ({ imageUrl, alt, className }) => {
     if (!imageUrl) return null;
     return (
@@ -76,12 +76,16 @@ const InterstitialBanner = ({ imageUrl, alt, className }) => {
 
 function App() {
     const [articles, setArticles] = useState([]);
-    const [homeBlockArticles, setHomeBlockArticles] = useState({}); // Lưu trữ data từng block
-    const [loading, setLoading] = useState(false); // Loading cho trang chi tiết
+    const [allArticles, setAllArticles] = useState([]); // Backup dữ liệu để tìm kiếm
+    const [homeBlockArticles, setHomeBlockArticles] = useState({});
+    const [loading, setLoading] = useState(false);
     const [selectedArticle, setSelectedArticle] = useState(null);
     const [detailContent, setDetailContent] = useState("");
     const [isCrawling, setIsCrawling] = useState(false);
     const [currentCatName, setCurrentCatName] = useState("Trang chủ");
+
+    // State cho tìm kiếm
+    const [searchText, setSearchText] = useState("");
 
     const extractImage = (description) => {
         if (!description) return null;
@@ -115,23 +119,67 @@ function App() {
         }
     };
 
-    // --- LOGIC TẢI DỮ LIỆU TỪNG PHẦN (CẢI TIẾN) ---
+    // --- LOGIC TÌM KIẾM ĐÃ NÂNG CẤP ---
+    const handleSearch = (e) => {
+        e.preventDefault();
+
+        // 1. Nếu ô tìm kiếm trống
+        if (!searchText || searchText.trim() === "") {
+            // Nếu đang ở màn hình kết quả tìm kiếm thì load lại Trang chủ
+            if (currentCatName.includes("Kết quả")) {
+                fetchRSS(CATEGORY_TREE[0].url, "Trang chủ");
+            } else {
+                setArticles(allArticles); // Trả lại tin cũ
+            }
+            return;
+        }
+
+        // 2. Tạo kho dữ liệu tìm kiếm (Gộp cả tin Toàn cảnh + Tin của 12 khối chuyên mục)
+        let searchPool = [...allArticles];
+
+        // Nếu đang ở Trang chủ hoặc đang Tìm kiếm, ta gộp thêm dữ liệu từ các khối (Giáo dục, Thời sự...) vào để tìm cho rộng
+        if (currentCatName === "Trang chủ" || currentCatName.includes("Kết quả")) {
+            Object.values(homeBlockArticles).forEach(blockItems => {
+                if (Array.isArray(blockItems)) {
+                    searchPool = [...searchPool, ...blockItems];
+                }
+            });
+        }
+
+        // Loại bỏ tin trùng lặp (nếu có)
+        const uniquePool = Array.from(new Set(searchPool.map(a => a.link)))
+            .map(link => searchPool.find(a => a.link === link));
+
+        const lowerKey = searchText.toLowerCase();
+
+        // 3. Thực hiện lọc
+        const filtered = uniquePool.filter(item => {
+            const title = item.title ? item.title.toLowerCase() : "";
+            const desc = item.cleanDesc ? item.cleanDesc.toLowerCase() : "";
+            return title.includes(lowerKey) || desc.includes(lowerKey);
+        });
+
+        // 4. Cập nhật kết quả
+        setArticles(filtered);
+        setCurrentCatName(`Kết quả tìm kiếm: "${searchText}"`);
+        window.scrollTo(0, 0);
+    };
+
     useEffect(() => {
-        // 1. Tải trang chủ (Main feed)
         const fetchMainFeed = async () => {
             setLoading(true);
             const data = await getRSSData(CATEGORY_TREE[0].url);
             setArticles(data);
+            setAllArticles(data);
             setLoading(false);
         };
         fetchMainFeed();
 
-        // 2. Tải các khối danh mục ĐỘC LẬP (Không đợi nhau)
         HOME_BLOCKS.forEach(async (block) => {
             const items = await getRSSData(block.url);
             setHomeBlockArticles(prev => ({
                 ...prev,
-                [block.name]: items // Cập nhật ngay khi khối này tải xong
+                [block.name]: items
             }));
         });
     }, []);
@@ -140,8 +188,11 @@ function App() {
         setLoading(true);
         setCurrentCatName(name);
         setArticles([]);
+        setSearchText(""); // Reset ô tìm kiếm
+
         const data = await getRSSData(url);
         setArticles(data);
+        setAllArticles(data);
         setLoading(false);
         window.scrollTo(0, 0);
     };
@@ -174,11 +225,9 @@ function App() {
     };
 
     const NewsSection = ({ title, data, onTitleClick }) => {
-
-        if (!data) {
-            return <NewsBlockSkeleton title={title} />;
-        }
+        if (!data) return <NewsBlockSkeleton title={title} />;
         if (data.length === 0) return null;
+
         return (
             <div className="news-section-block mb-5">
                 <div className="d-flex justify-content-between align-items-center border-bottom border-danger border-2 mb-3">
@@ -236,7 +285,16 @@ function App() {
                         </div>
                     </div>
                     <div className="d-flex align-items-center header-right">
-                        <Form className="d-none d-md-flex me-3"><FormControl type="search" placeholder="Tìm kiếm..." className="rounded-pill bg-light border-0 px-4 py-2" /></Form>
+                        <Form className="d-none d-md-flex me-3" onSubmit={handleSearch}>
+                            <FormControl
+                                type="search"
+                                placeholder="Tìm kiếm..."
+                                className="rounded-pill bg-light border-0 px-4 py-2"
+                                value={searchText}
+                                onChange={(e) => setSearchText(e.target.value)}
+                            />
+                            <Button variant="outline-danger" type="submit" className="ms-2 rounded-pill btn-sm">Tìm</Button>
+                        </Form>
                         <div className="sub-logo-box text-end lh-1 border-start ps-3"><div className="text-danger fw-bold fs-5">GIÁO DỤC</div><div className="text-dark fw-bold small">VIỆT NAM</div></div>
                     </div>
                 </Container>
@@ -267,8 +325,8 @@ function App() {
                     <Col lg={9}>
                         {loading ? (<div className="text-center py-5"><Spinner animation="border" variant="danger" /></div>) : (
                             <>
-                                {/* Toàn cảnh - Sự kiện (Chỉ hiện ở Trang chủ) */}
-                                {currentCatName === "Trang chủ" && articles.length > 0 && (
+                                {/* Toàn cảnh (Chỉ hiện nếu không phải đang tìm kiếm và đang ở trang chủ) */}
+                                {currentCatName === "Trang chủ" && !currentCatName.includes("Kết quả") && articles.length > 0 && (
                                     <div className="mb-5">
                                         <div className="toan-canh-title mb-4 d-flex align-items-center"><h4 className="fw-bold text-danger m-0" style={{ borderBottom: '3px solid #dc3545', paddingBottom: '5px' }}>Toàn cảnh - Sự kiện</h4><span className="flex-grow-1 ms-3 border-bottom"></span></div>
                                         <Row>
@@ -278,26 +336,24 @@ function App() {
                                     </div>
                                 )}
 
-                                {/* Banner xen kẽ sau Toàn cảnh */}
                                 {currentCatName === "Trang chủ" && (
                                     <InterstitialBanner imageUrl={banner3} alt="Quảng cáo nổi bật" />
                                 )}
 
-                                {/* Danh sách tin thường (Khi xem chuyên mục khác Trang chủ) */}
+                                {/* List tin thường (Hoặc Kết quả tìm kiếm) */}
                                 {currentCatName !== "Trang chủ" && (
                                     <>
                                         <div className="section-title mb-4 border-bottom pb-2 border-danger border-2"><h5 className="fw-bold text-danger text-uppercase mb-0">{currentCatName}</h5></div>
                                         {articles.length === 0 ? (
-                                            <div className="text-center py-5 text-muted bg-light rounded"><i className="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i><p>Chưa có tin bài trong chuyên mục này hoặc kết nối bị gián đoạn.</p><Button variant="outline-danger" size="sm" onClick={() => fetchRSS(CATEGORY_TREE.find(c => c.name === currentCatName)?.url || "", currentCatName)}>Thử tải lại</Button></div>
+                                            <div className="text-center py-5 text-muted bg-light rounded"><i className="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i><p>Không tìm thấy tin bài phù hợp hoặc kết nối bị gián đoạn.</p><Button variant="outline-danger" size="sm" onClick={() => window.location.reload()}>Tải lại trang</Button></div>
                                         ) : (
                                             <Row>{articles.map((item, idx) => (<Col md={idx === 0 ? 12 : 6} key={idx} className="mb-4"><Card className={`news-card h-100 border-0 shadow-sm ${idx === 0 ? 'featured-card' : ''}`}><Card.Body className={idx === 0 ? 'd-md-flex p-0' : 'p-3'}>{idx === 0 && (<div className="featured-img-box col-md-6 bg-light overflow-hidden">{item.imageUrl && <img src={item.imageUrl} className="w-100 h-100 object-fit-cover" alt="" />}</div>)}<div className={`d-flex flex-column ${idx === 0 ? 'p-4 col-md-6' : ''}`}><Card.Title className={`fw-bold hover-blue ${idx === 0 ? 'fs-3' : 'fs-6'}`} onClick={() => crawlArticle(item)}>{item.title}</Card.Title><Card.Text className="text-muted small">{item.cleanDesc}</Card.Text></div></Card.Body></Card></Col>))}</Row>
                                         )}
                                     </>
                                 )}
 
-                                {/* Các khối tin tức trang chủ + Banner xen kẽ */}
                                 {currentCatName === "Trang chủ" && HOME_BLOCKS.map((block, idx) => {
-                                    const bannerToRender = INTERSTITIAL_BANNERS.find(b => b.afterIndex === idx); // Đã định nghĩa INTERSTITIAL_BANNERS ở ngoài hoặc trên
+                                    const bannerToRender = INTERSTITIAL_BANNERS.find(b => b.afterIndex === idx);
                                     return (
                                         <React.Fragment key={idx}>
                                             <NewsSection
@@ -319,27 +375,22 @@ function App() {
                         )}
                     </Col>
 
-                    {/* Sidebar */}
                     <Col lg={3}>
-                        {/* Box Mới cập nhật */}
-                        <div className="sidebar-box mb-4">
-                            <div className="sidebar-header bg-danger text-white p-2 fw-bold text-uppercase mb-0"><i className="bi bi-star-fill me-2 text-warning"></i> Mới cập nhật</div>
-                            <div className="sidebar-content border border-top-0 p-2 bg-white" style={{maxHeight: '500px', overflowY: 'auto'}}>
-                                {/* Sử dụng hàm crawlArticle để mở Modal đọc tin khi click vào tin Mới cập nhật */}
-                                {articles.slice(6, 15).map((item, idx) => (
-                                    <div key={idx} className="mb-2 pb-2 border-bottom cursor-pointer" onClick={() => crawlArticle(item)}>
-                                        <h6 className="fw-bold small hover-blue mb-1">{item.title}</h6>
-                                        <span className="text-muted" style={{ fontSize: '0.7rem' }}>Vừa xong</span>
-                                    </div>
-                                ))}
+                        <div className="sidebar-box mb-4"><div className="sidebar-header bg-danger text-white p-2 fw-bold text-uppercase mb-0"><i className="bi bi-star-fill me-2 text-warning"></i> Mới cập nhật</div><div className="sidebar-content border border-top-0 p-2 bg-white" style={{maxHeight: '500px', overflowY: 'auto'}}>{articles.slice(6, 15).map((item, idx) => (<div key={idx} className="mb-2 pb-2 border-bottom cursor-pointer" onClick={() => crawlArticle(item)}><h6 className="fw-bold small hover-blue mb-1">{item.title}</h6><span className="text-muted" style={{ fontSize: '0.7rem' }}>Vừa xong</span></div>))}</div></div>
+
+                        {/* BOX SUY NGẪM - Đã fix link */}
+                        <a href="https://giaoducthoidai.vn/trao-doi/" target="_blank" rel="noreferrer" className="text-decoration-none text-dark">
+                            <div className="sidebar-box mb-4 cursor-pointer">
+                                <div className="sidebar-header p-2 fw-bold text-uppercase mb-0 border-start border-5 border-danger text-danger bg-light">SUY NGẪM</div>
+                                <div className="sidebar-content p-3 bg-light">
+                                    <h6 className="fw-bold mb-2 hover-blue">Sắp nhập trường cao đẳng sư phạm: Tất yếu của đổi mới</h6>
+                                    <p className="small text-muted mb-0">GD&TĐ - Việc sáp nhập các trường cao đẳng sư phạm là xu thế tất yếu nhằm nâng cao chất lượng...</p>
+                                </div>
                             </div>
-                        </div>
+                        </a>
 
-                        {/* Box Suy ngẫm (Tĩnh hoặc có thể thay đổi sau) */}
-                        <div className="sidebar-box mb-4"><div className="sidebar-header p-2 fw-bold text-uppercase mb-0 border-start border-5 border-danger text-danger bg-light">SUY NGẪM</div><div className="sidebar-content p-3 bg-light"><h6 className="fw-bold mb-2">Sắp nhập trường cao đẳng sư phạm: Tất yếu của đổi mới</h6><p className="small text-muted mb-0">GD&TĐ - Việc sáp nhập các trường cao đẳng sư phạm là xu thế tất yếu nhằm nâng cao chất lượng...</p></div></div>
-
-                        {/* Banner Đọc báo in Online - Đã sửa thành thẻ a để chuyển trang */}
-                        <a href="https://baogiay.giaoducthoidai.vn/" target="_blank" rel="noreferrer" className="text-decoration-none">
+                        {/* BANNER BÁO IN - Đã fix link, đảm bảo bấm vào được */}
+                        <a href="https://baogiay.giaoducthoidai.vn/" target="_blank" rel="noreferrer" className="text-decoration-none d-block">
                             <div className="baoin-banner text-center text-white p-4 rounded shadow-sm d-flex flex-column align-items-center justify-content-center cursor-pointer mb-4">
                                 <i className="bi bi-newspaper fs-1 mb-2"></i>
                                 <h5 className="fw-bold mb-0">ĐỌC BÁO IN</h5>
@@ -350,10 +401,8 @@ function App() {
                 </Row>
             </Container>
 
-            {/* Footer */}
             <footer className="footer-site mt-0 pt-0 pb-3 text-white">
                 <Container>
-                    {/* Footer Nav Bar - Trỏ về các chuyên mục trên trang gốc giaoducthoidai.vn */}
                     <div className="footer-nav-bar d-flex justify-content-center flex-wrap">
                         <a href="https://giaoducthoidai.vn/giao-duc/" target="_blank" rel="noreferrer" className="footer-nav-link">GIÁO DỤC</a>
                         <a href="https://giaoducthoidai.vn/thoi-su/" target="_blank" rel="noreferrer" className="footer-nav-link">THỜI SỰ</a>
@@ -362,21 +411,16 @@ function App() {
                         <a href="https://giaoducthoidai.vn/video-media/" target="_blank" rel="noreferrer" className="footer-nav-link">MEDIA</a>
                     </div>
 
-                    {/* Tags Area - Trỏ về các website đối tác hoặc liên kết SEO */}
                     <div className="footer-tags-area text-center">
                         <a href="https://tracnghiem.net" target="_blank" rel="noreferrer" className="footer-tag-link"><strong>Thi Thử Trắc Nghiệm</strong></a>
                         <a href="https://sachweb.com" target="_blank" rel="noreferrer" className="footer-tag-link">sách đọc online</a>
                         <a href="#" className="footer-tag-link">The Fullton</a>
                         <a href="#" className="footer-tag-link"><strong>Woku Shop</strong> - Bản quyền giá tốt</a>
-
-                        {/* Các link có địa chỉ cụ thể trong text */}
                         <a href="https://chothuenha.me" target="_blank" rel="noreferrer" className="footer-tag-link"><strong>cho thuê nhà</strong> tại Chothuenha.me</a>
                         <a href="https://thuecanho123.com" target="_blank" rel="noreferrer" className="footer-tag-link"><strong>Thuecanho123</strong> - Website cho thuê căn hộ uy tín</a>
-
                         <a href="https://diemthi.tuyensinh247.com" target="_blank" rel="noreferrer" className="footer-tag-link">tra cứu điểm</a>
                         <a href="https://nchmf.gov.vn" target="_blank" rel="noreferrer" className="footer-tag-link">thời tiết ngày mai</a>
                         <a href="https://hanhtrangso.nxbgd.vn" target="_blank" rel="noreferrer" className="footer-tag-link">Sách giáo khoa</a>
-
                         <a href="https://bds123.vn" target="_blank" rel="noreferrer" className="footer-tag-link">Tìm <strong>bất động sản</strong> tại Bds123.vn</a>
                         <a href="https://phongtro123.com/tinh-thanh/ho-chi-minh" target="_blank" rel="noreferrer" className="footer-tag-link">Tìm <strong>phòng trọ Hồ Chí Minh</strong> tại Phongtro123.com</a>
                         <a href="https://slicemaster.net" target="_blank" rel="noreferrer" className="footer-tag-link"><strong>Slice Master</strong> Upgrade Version At Slicemaster.net</a>
@@ -384,7 +428,6 @@ function App() {
                     </div>
                 </Container>
 
-                {/* Main Footer Info (Phần thông tin tòa soạn giữ nguyên) */}
                 <div className="footer-main-info mt-0">
                     <Container>
                         <Row>
@@ -395,7 +438,6 @@ function App() {
                                 </div>
                                 <div className="footer-logo-sub text-center">BÁO GIÁO DỤC & THỜI ĐẠI</div>
                             </Col>
-
                             <Col md={5} className="mb-4 mb-md-0 footer-info-text">
                                 <p className="mb-2 fw-bold text-uppercase">CƠ QUAN CỦA BỘ GIÁO DỤC VÀ ĐÀO TẠO - DIỄN ĐÀN TOÀN XÃ HỘI VÌ SỰ NGHIỆP GIÁO DỤC</p>
                                 <p className="mb-1">Cơ quan chủ quản: BỘ GIÁO DỤC VÀ ĐÀO TẠO</p>
@@ -404,21 +446,18 @@ function App() {
                                 <p className="mb-1">Phó Tổng Biên tập: <strong>Dương Thanh Hương - Nguyễn Đức Tuân</strong></p>
                                 <p className="mb-0">® Ghi rõ nguồn "Báo Giáo dục & Thời đại" khi phát hành lại thông tin từ website.</p>
                             </Col>
-
                             <Col md={4} className="footer-info-text">
                                 <div className="footer-heading">TRỤ SỞ CHÍNH</div>
                                 <p className="mb-1">Tòa soạn: 15 Hai Bà Trưng - P.Cửa Nam - Hà Nội.</p>
                                 <p className="mb-1">Điện thoại: 024 3936 9800</p>
                                 <p className="mb-1">Hotline: 0967 335 089</p>
                                 <p className="mb-3">Email: gdtddientu@gmail.com</p>
-
                                 <div className="footer-heading">LIÊN HỆ QUẢNG CÁO, TRUYỀN THÔNG VÀ ĐẶT BÁO</div>
                                 <p className="mb-1">Phòng Truyền thông và Dự án</p>
                                 <p className="mb-0">Hotline: 0886 059 988</p>
                             </Col>
                         </Row>
                     </Container>
-
                     <div className="footer-bottom text-center small opacity-75 mt-3 pt-2 border-top border-white border-opacity-25">
                         <p className="m-0">© 2025 Báo Giáo dục và Thời đại. All rights reserved.</p>
                     </div>
