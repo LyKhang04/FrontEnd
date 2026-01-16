@@ -274,3 +274,22 @@
     height: 100%;
     display: block;
 }
+
+.cursor-pointer {
+    cursor: pointer !important;
+}
+
+
+.footer-nav-link {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.footer-nav-link:hover {
+    color: #ffeb3b !important;
+    text-decoration: underline;
+}
+
+.baoin-banner {
+    cursor: pointer;
+}

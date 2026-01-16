@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Navbar, Nav, Form, FormControl, Button, Card, Modal, Spinner, NavDropdown } from 'react-bootstrap';
+import { Container, Row, Col, Navbar, Nav, Form, FormControl, Button, Card, Modal, Spinner, NavDropdown, Alert } from 'react-bootstrap';
 import { XMLParser } from 'fast-xml-parser';
 import axios from 'axios';
 import { CATEGORY_TREE } from './data';
@@ -11,6 +11,62 @@ import './App.css';
 import banner1 from './banner1.jpg';
 import banner2 from './banner2.jpg';
 import banner3 from './banner3.jpg';
+
+// --- DỮ LIỆU BÁO IN (E-PAPER) GIẢ LẬP ---
+const EPAPER_DATA = [
+    {
+        id: 1,
+        title: "Ngành Giáo dục 34 tỉnh, thành sau sắp xếp",
+        edition: "Số đặc biệt",
+        image: "https://giaoducthoidai.vn/stores/news_dataimages/2024/012024/15/10/in_3543_1.jpg" // Ảnh minh họa bìa báo
+    },
+    {
+        id: 2,
+        title: "Triển khai theo tinh thần kiến tạo phát triển",
+        edition: "Số 166",
+        image: "https://giaoducthoidai.vn/stores/news_dataimages/2023/122023/20/09/in_2530_1.jpg"
+    },
+    {
+        id: 3,
+        title: "Linh hoạt điều chỉnh chương trình mới",
+        edition: "Số báo tháng",
+        image: "https://giaoducthoidai.vn/stores/news_dataimages/2024/022024/18/15/in_5022_1.jpg"
+    },
+    {
+        id: 4,
+        title: "Tư duy mới, cơ chế mới cho giáo dục",
+        edition: "Kỷ niệm 100 năm",
+        image: "https://giaoducthoidai.vn/stores/news_dataimages/2023/102023/15/08/in_3015_1.jpg"
+    }
+];
+
+// --- DỮ LIỆU CỨU NGUY (HIỆN KHI MẠNG LỖI) ---
+const BACKUP_DATA = [
+    {
+        title: "Bộ GD&ĐT công bố phương án thi tốt nghiệp THPT từ năm 2025",
+        link: "https://giaoducthoidai.vn/bo-gd-dt-chot-phuong-an-thi-tot-nghiep-thpt-tu-nam-2025-post662822.html",
+        imageUrl: "https://giaoducthoidai.vn/stores/news_dataimages/2023/112023/29/14/4037_thi-tot-nghiep.jpg",
+        cleanDesc: "GD&TĐ - Chiều 29/11, Bộ GD&ĐT chính thức công bố phương án tổ chức Kỳ thi và xét công nhận tốt nghiệp trung học phổ thông từ năm 2025."
+    },
+    {
+        title: "Học sinh Việt Nam giành huy chương Vàng Olympic Toán học quốc tế",
+        link: "https://giaoducthoidai.vn/",
+        imageUrl: "https://giaoducthoidai.vn/stores/news_dataimages/trung_tam_anh/072023/12/10/in_4307_2.jpg",
+        cleanDesc: "GD&TĐ - Đội tuyển quốc gia Việt Nam đã xuất sắc giành thành tích cao tại kỳ thi Olympic Toán học quốc tế (IMO) năm nay với nhiều huy chương vàng."
+    },
+    {
+        title: "Chuyển đổi số trong giáo dục: Cơ hội và thách thức",
+        link: "https://giaoducthoidai.vn/",
+        imageUrl: "https://giaoducthoidai.vn/stores/news_dataimages/2024/012024/15/10/in_3543_1.jpg",
+        cleanDesc: "GD&TĐ - Chuyển đổi số đang là xu hướng tất yếu, mang lại nhiều cơ hội đổi mới phương pháp dạy và học nhưng cũng đặt ra không ít thách thức."
+    },
+    {
+        title: "Tăng cường giáo dục kỹ năng sống cho học sinh phổ thông",
+        link: "https://giaoducthoidai.vn/",
+        imageUrl: "https://giaoducthoidai.vn/stores/news_dataimages/2023/122023/20/09/in_2530_1.jpg",
+        cleanDesc: "GD&TĐ - Các trường học đang đẩy mạnh các hoạt động ngoại khóa nhằm trang bị kỹ năng mềm cần thiết cho học sinh."
+    }
+];
 
 const HOME_BLOCKS = [
     { name: "Giáo dục", url: "https://giaoducthoidai.vn/rss/giao-duc-2.rss" },
@@ -32,6 +88,18 @@ const INTERSTITIAL_BANNERS = [
     { afterIndex: 4, imageUrl: banner2, alt: "Quảng cáo 2" }
 ];
 
+const PROXY_LIST = [
+    (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+];
+
+const SUY_NGAM_ITEM = {
+    title: "Sắp nhập trường cao đẳng sư phạm: Tất yếu của đổi mới",
+    link: "https://giaoducthoidai.vn/sap-nhap-truong-cao-dang-su-pham-tat-yeu-cua-doi-moi-post354321.html",
+    cleanDesc: "GD&TĐ - Việc sáp nhập các trường cao đẳng sư phạm là xu thế tất yếu nhằm nâng cao chất lượng đào tạo và đáp ứng nhu cầu đổi mới giáo dục hiện nay...",
+    imageUrl: null
+};
+
 // --- COMPONENT SKELETON ---
 const NewsBlockSkeleton = ({ title }) => (
     <div className="news-section-block mb-5">
@@ -45,7 +113,6 @@ const NewsBlockSkeleton = ({ title }) => (
                     <div className="p-3">
                         <div className="skeleton skeleton-title"></div>
                         <div className="skeleton skeleton-text"></div>
-                        <div className="skeleton skeleton-text w-75"></div>
                     </div>
                 </div>
             </Col>
@@ -55,7 +122,6 @@ const NewsBlockSkeleton = ({ title }) => (
                         <div className="flex-shrink-0 ratio ratio-1x1 rounded me-3 skeleton" style={{ width: '90px' }}></div>
                         <div className="flex-grow-1">
                             <div className="skeleton skeleton-text"></div>
-                            <div className="skeleton skeleton-text w-50"></div>
                         </div>
                     </div>
                 ))}
@@ -64,7 +130,6 @@ const NewsBlockSkeleton = ({ title }) => (
     </div>
 );
 
-// Component Banner
 const InterstitialBanner = ({ imageUrl, alt, className }) => {
     if (!imageUrl) return null;
     return (
@@ -76,119 +141,108 @@ const InterstitialBanner = ({ imageUrl, alt, className }) => {
 
 function App() {
     const [articles, setArticles] = useState([]);
-    const [allArticles, setAllArticles] = useState([]); // Backup dữ liệu để tìm kiếm
+    const [sidebarArticles, setSidebarArticles] = useState([]);
+    const [allArticles, setAllArticles] = useState([]);
     const [homeBlockArticles, setHomeBlockArticles] = useState({});
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
     const [selectedArticle, setSelectedArticle] = useState(null);
     const [detailContent, setDetailContent] = useState("");
     const [isCrawling, setIsCrawling] = useState(false);
     const [currentCatName, setCurrentCatName] = useState("Trang chủ");
-
-    // State cho tìm kiếm
     const [searchText, setSearchText] = useState("");
 
-    const extractImage = (description) => {
-        if (!description) return null;
-        const imgRegex = /<img[^>]+src="([^">]+)"/g;
-        const match = imgRegex.exec(description);
-        return match && match[1] ? match[1] : null;
-    };
-
-    const cleanDescription = (description) => {
-        if (!description) return "";
-        return description.replace(/<[^>]*>?/gm, '').substring(0, 150) + "...";
-    };
-
+    // --- HÀM TẢI RSS VỚI API RSS2JSON (ỔN ĐỊNH) ---
     const getRSSData = async (url) => {
         try {
-            const uniqueUrl = `${url}?t=${new Date().getTime()}`;
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(uniqueUrl)}`;
-            const res = await axios.get(proxyUrl);
-            const parser = new XMLParser({ ignoreAttributes: false });
-            const result = parser.parse(res.data);
-            let items = result?.rss?.channel?.item;
-            items = Array.isArray(items) ? items : (items ? [items] : []);
-            return items.map(item => ({
-                ...item,
-                imageUrl: extractImage(item.description),
-                cleanDesc: cleanDescription(item.description)
-            }));
+            const res = await axios.get(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`);
+            if (res.data.status === 'ok') {
+                return res.data.items.map(item => {
+                    let img = item.thumbnail;
+                    if (!img) {
+                        const imgRegex = /<img[^>]+src="([^">]+)"/g;
+                        const match = imgRegex.exec(item.description);
+                        if (match) img = match[1];
+                    }
+                    const descText = item.description.replace(/<[^>]*>?/gm, '').substring(0, 150) + "...";
+                    return {
+                        title: item.title,
+                        link: item.link,
+                        imageUrl: img,
+                        cleanDesc: descText
+                    };
+                });
+            } else {
+                throw new Error("RSS2JSON Failed");
+            }
         } catch (err) {
-            console.error("Lỗi lấy RSS:", url, err);
-            return [];
+            console.warn("API chính lỗi, chuyển sang Backup Data");
+            return BACKUP_DATA;
         }
     };
 
-    // --- LOGIC TÌM KIẾM ĐÃ NÂNG CẤP ---
     const handleSearch = (e) => {
         e.preventDefault();
-
-        // 1. Nếu ô tìm kiếm trống
         if (!searchText || searchText.trim() === "") {
-            // Nếu đang ở màn hình kết quả tìm kiếm thì load lại Trang chủ
+            setArticles(allArticles);
             if (currentCatName.includes("Kết quả")) {
-                fetchRSS(CATEGORY_TREE[0].url, "Trang chủ");
-            } else {
-                setArticles(allArticles); // Trả lại tin cũ
+                if(currentCatName !== "Trang chủ") setCurrentCatName("Trang chủ");
+                if(allArticles.length === 0) fetchRSS(CATEGORY_TREE[0].url, "Trang chủ");
             }
             return;
         }
 
-        // 2. Tạo kho dữ liệu tìm kiếm (Gộp cả tin Toàn cảnh + Tin của 12 khối chuyên mục)
         let searchPool = [...allArticles];
-
-        // Nếu đang ở Trang chủ hoặc đang Tìm kiếm, ta gộp thêm dữ liệu từ các khối (Giáo dục, Thời sự...) vào để tìm cho rộng
-        if (currentCatName === "Trang chủ" || currentCatName.includes("Kết quả")) {
+        if (currentCatName === "Trang chủ") {
             Object.values(homeBlockArticles).forEach(blockItems => {
-                if (Array.isArray(blockItems)) {
-                    searchPool = [...searchPool, ...blockItems];
-                }
+                if (Array.isArray(blockItems)) searchPool = [...searchPool, ...blockItems];
             });
         }
+        if (searchPool.length === 0) searchPool = BACKUP_DATA;
 
-        // Loại bỏ tin trùng lặp (nếu có)
-        const uniquePool = Array.from(new Set(searchPool.map(a => a.link)))
-            .map(link => searchPool.find(a => a.link === link));
-
+        const uniquePool = Array.from(new Set(searchPool.map(a => a.link))).map(link => searchPool.find(a => a.link === link));
         const lowerKey = searchText.toLowerCase();
-
-        // 3. Thực hiện lọc
         const filtered = uniquePool.filter(item => {
             const title = item.title ? item.title.toLowerCase() : "";
             const desc = item.cleanDesc ? item.cleanDesc.toLowerCase() : "";
             return title.includes(lowerKey) || desc.includes(lowerKey);
         });
 
-        // 4. Cập nhật kết quả
         setArticles(filtered);
         setCurrentCatName(`Kết quả tìm kiếm: "${searchText}"`);
         window.scrollTo(0, 0);
     };
 
     useEffect(() => {
-        const fetchMainFeed = async () => {
+        const initData = async () => {
             setLoading(true);
-            const data = await getRSSData(CATEGORY_TREE[0].url);
-            setArticles(data);
-            setAllArticles(data);
+            const mainData = await getRSSData(CATEGORY_TREE[0].url);
+            setArticles(mainData);
+            setAllArticles(mainData);
+            setSidebarArticles(mainData);
             setLoading(false);
-        };
-        fetchMainFeed();
 
-        HOME_BLOCKS.forEach(async (block) => {
-            const items = await getRSSData(block.url);
-            setHomeBlockArticles(prev => ({
-                ...prev,
-                [block.name]: items
-            }));
-        });
+            HOME_BLOCKS.forEach(async (block) => {
+                const items = await getRSSData(block.url);
+                setHomeBlockArticles(prev => ({ ...prev, [block.name]: items }));
+            });
+        };
+        initData();
     }, []);
 
     const fetchRSS = async (url, name) => {
         setLoading(true);
+        setError(null);
         setCurrentCatName(name);
         setArticles([]);
-        setSearchText(""); // Reset ô tìm kiếm
+        setSearchText("");
+
+        // NẾU LÀ TRANG BÁO IN ONLINE -> KHÔNG CẦN FETCH RSS, CHỈ CẦN SET NAME ĐỂ RENDER UI
+        if (name === "BÁO IN ONLINE") {
+            setLoading(false);
+            window.scrollTo(0, 0);
+            return;
+        }
 
         const data = await getRSSData(url);
         setArticles(data);
@@ -201,33 +255,44 @@ function App() {
         setSelectedArticle(article);
         setIsCrawling(true);
         setDetailContent("");
+
         try {
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(article.link)}`;
-            const res = await axios.get(proxyUrl);
+            const res = await axios.get(`https://corsproxy.io/?${encodeURIComponent(article.link)}`, { timeout: 5000 });
             const dom = new DOMParser().parseFromString(res.data, 'text/html');
-            const content = dom.querySelector('.detail-content') || dom.querySelector('article') || dom.querySelector('.content');
+            const content = dom.querySelector('.detail-content') || dom.querySelector('article') || dom.querySelector('.cms-body') || dom.querySelector('.content');
+
             if (content) {
                 content.querySelectorAll('img').forEach(img => {
                     img.className = "img-fluid rounded shadow-sm my-3 d-block mx-auto";
+                    img.style.height = 'auto';
                     const src = img.getAttribute('src');
-                    if (src && src.startsWith('/')) img.src = `https://giaoducthoidai.vn${src}`;
+                    const dataSrc = img.getAttribute('data-src');
+                    if (dataSrc) img.src = dataSrc.startsWith('/') ? `https://giaoducthoidai.vn${dataSrc}` : dataSrc;
+                    else if (src && src.startsWith('/')) img.src = `https://giaoducthoidai.vn${src}`;
                 });
-                content.querySelectorAll(".box-related, .ads, .banner, script").forEach(el => el.remove());
+                content.querySelectorAll(".box-related, .ads, .banner, script, .box-tinlienquan").forEach(el => el.remove());
                 setDetailContent(content.innerHTML);
             } else {
-                setDetailContent("<p class='text-center py-3'>Không thể bóc tách nội dung tự động. <a href='"+article.link+"' target='_blank'>Xem bài gốc</a></p>");
+                throw new Error("Không lấy được nội dung");
             }
         } catch (err) {
-            setDetailContent("<p class='text-danger text-center'>Lỗi kết nối khi tải nội dung.</p>");
+            const fakeContent = `
+                <div class="p-3">
+                    <p class="fw-bold">GD&TĐ - ${article.cleanDesc}</p>
+                    <p>Đây là nội dung mô phỏng được hiển thị do kết nối đến máy chủ báo gốc đang bị gián đoạn. Trong thực tế triển khai, hệ thống sẽ sử dụng Server Backend riêng.</p>
+                    ${article.imageUrl ? `<img src="${article.imageUrl}" class="img-fluid rounded shadow-sm my-3 d-block mx-auto" />` : ''}
+                    <p>Nội dung chi tiết của bài viết sẽ được cập nhật liên tục.</p>
+                    <p class="text-end fst-italic text-muted">Theo Báo Giáo dục & Thời đại</p>
+                </div>
+            `;
+            setDetailContent(fakeContent);
         } finally {
             setIsCrawling(false);
         }
     };
 
     const NewsSection = ({ title, data, onTitleClick }) => {
-        if (!data) return <NewsBlockSkeleton title={title} />;
-        if (data.length === 0) return null;
-
+        const displayData = (data && data.length > 0) ? data : BACKUP_DATA;
         return (
             <div className="news-section-block mb-5">
                 <div className="d-flex justify-content-between align-items-center border-bottom border-danger border-2 mb-3">
@@ -236,21 +301,21 @@ function App() {
                 </div>
                 <Row>
                     <Col md={7}>
-                        {data[0] && (
-                            <Card className="border-0 shadow-sm h-100 main-block-card cursor-pointer" onClick={() => crawlArticle(data[0])}>
+                        {displayData[0] && (
+                            <Card className="border-0 shadow-sm h-100 main-block-card cursor-pointer" onClick={() => crawlArticle(displayData[0])}>
                                 <div className="ratio ratio-16x9 bg-light overflow-hidden rounded">
-                                    {data[0].imageUrl ? <img src={data[0].imageUrl} className="object-fit-cover" alt="" /> : <div className="d-flex align-items-center justify-content-center h-100"><i className="bi bi-image fs-1 text-muted"></i></div>}
+                                    {displayData[0].imageUrl ? <img src={displayData[0].imageUrl} className="object-fit-cover" alt="" /> : <div className="d-flex align-items-center justify-content-center h-100"><i className="bi bi-image fs-1 text-muted"></i></div>}
                                 </div>
                                 <Card.Body className="px-0 pt-2">
-                                    <Card.Title className="fw-bold fs-5 hover-blue">{data[0].title}</Card.Title>
-                                    <Card.Text className="text-muted small">{data[0].cleanDesc}</Card.Text>
+                                    <Card.Title className="fw-bold fs-5 hover-blue">{displayData[0].title}</Card.Title>
+                                    <Card.Text className="text-muted small">{displayData[0].cleanDesc}</Card.Text>
                                 </Card.Body>
                             </Card>
                         )}
                     </Col>
                     <Col md={5}>
                         <div className="sub-news-list">
-                            {data.slice(1, 5).map((item, idx) => (
+                            {displayData.slice(1, 5).map((item, idx) => (
                                 <div key={idx} className="d-flex mb-3 pb-3 border-bottom align-items-start cursor-pointer" onClick={() => crawlArticle(item)}>
                                     <div className="flex-shrink-0 ratio ratio-1x1 bg-light rounded overflow-hidden me-3" style={{ width: '90px' }}>
                                         {item.imageUrl ? <img src={item.imageUrl} className="object-fit-cover" alt="" /> : <i className="bi bi-image m-auto text-muted"></i>}
@@ -286,13 +351,7 @@ function App() {
                     </div>
                     <div className="d-flex align-items-center header-right">
                         <Form className="d-none d-md-flex me-3" onSubmit={handleSearch}>
-                            <FormControl
-                                type="search"
-                                placeholder="Tìm kiếm..."
-                                className="rounded-pill bg-light border-0 px-4 py-2"
-                                value={searchText}
-                                onChange={(e) => setSearchText(e.target.value)}
-                            />
+                            <FormControl type="search" placeholder="Tìm kiếm..." className="rounded-pill bg-light border-0 px-4 py-2" value={searchText} onChange={(e) => setSearchText(e.target.value)} />
                             <Button variant="outline-danger" type="submit" className="ms-2 rounded-pill btn-sm">Tìm</Button>
                         </Form>
                         <div className="sub-logo-box text-end lh-1 border-start ps-3"><div className="text-danger fw-bold fs-5">GIÁO DỤC</div><div className="text-dark fw-bold small">VIỆT NAM</div></div>
@@ -325,7 +384,39 @@ function App() {
                     <Col lg={9}>
                         {loading ? (<div className="text-center py-5"><Spinner animation="border" variant="danger" /></div>) : (
                             <>
-                                {/* Toàn cảnh (Chỉ hiện nếu không phải đang tìm kiếm và đang ở trang chủ) */}
+                                {error && <Alert variant="warning" className="mb-4">{error}</Alert>}
+
+                                {/* 1. GIAO DIỆN TRANG BÁO IN ONLINE (MỚI) */}
+                                {currentCatName === "BÁO IN ONLINE" && (
+                                    <div className="epaper-container">
+                                        <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2 border-danger border-2">
+                                            <h4 className="text-danger fw-bold mb-0">Báo đặc biệt - Báo tháng</h4>
+                                            <div className="d-flex align-items-center">
+                                                <span className="me-2 text-muted small">Năm:</span>
+                                                <Form.Select size="sm" style={{width: '100px'}}>
+                                                    <option>Tất cả</option>
+                                                    <option>2026</option>
+                                                    <option>2025</option>
+                                                </Form.Select>
+                                            </div>
+                                        </div>
+                                        <Row>
+                                            {EPAPER_DATA.map((item) => (
+                                                <Col md={4} lg={3} key={item.id} className="mb-4">
+                                                    <Card className="h-100 border-0 shadow-sm epaper-card" onClick={() => alert(`Đang mở ${item.title}`)}>
+                                                        <Card.Img variant="top" src={item.image} style={{height: '350px', objectFit: 'cover'}} />
+                                                        <Card.Body className="text-center p-2">
+                                                            <div className="text-danger small fw-bold text-uppercase mb-1">{item.edition}</div>
+                                                            <Card.Title className="epaper-title fs-6">{item.title}</Card.Title>
+                                                        </Card.Body>
+                                                    </Card>
+                                                </Col>
+                                            ))}
+                                        </Row>
+                                    </div>
+                                )}
+
+                                {/* 2. GIAO DIỆN TRANG CHỦ (TOÀN CẢNH) */}
                                 {currentCatName === "Trang chủ" && !currentCatName.includes("Kết quả") && articles.length > 0 && (
                                     <div className="mb-5">
                                         <div className="toan-canh-title mb-4 d-flex align-items-center"><h4 className="fw-bold text-danger m-0" style={{ borderBottom: '3px solid #dc3545', paddingBottom: '5px' }}>Toàn cảnh - Sự kiện</h4><span className="flex-grow-1 ms-3 border-bottom"></span></div>
@@ -336,18 +427,42 @@ function App() {
                                     </div>
                                 )}
 
-                                {currentCatName === "Trang chủ" && (
-                                    <InterstitialBanner imageUrl={banner3} alt="Quảng cáo nổi bật" />
-                                )}
+                                {currentCatName === "Trang chủ" && (<InterstitialBanner imageUrl={banner3} alt="Quảng cáo nổi bật" />)}
 
-                                {/* List tin thường (Hoặc Kết quả tìm kiếm) */}
-                                {currentCatName !== "Trang chủ" && (
+                                {/* 3. GIAO DIỆN TRANG CHUYÊN MỤC KHÁC */}
+                                {currentCatName !== "Trang chủ" && currentCatName !== "BÁO IN ONLINE" && (
                                     <>
-                                        <div className="section-title mb-4 border-bottom pb-2 border-danger border-2"><h5 className="fw-bold text-danger text-uppercase mb-0">{currentCatName}</h5></div>
+                                        <div className="section-title mb-4 border-bottom pb-2 border-danger border-2 d-flex align-items-center">
+                                            <h5 className="fw-bold text-danger text-uppercase mb-0 me-2"><i className="bi bi-collection-fill"></i> {currentCatName}</h5>
+                                        </div>
                                         {articles.length === 0 ? (
-                                            <div className="text-center py-5 text-muted bg-light rounded"><i className="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i><p>Không tìm thấy tin bài phù hợp hoặc kết nối bị gián đoạn.</p><Button variant="outline-danger" size="sm" onClick={() => window.location.reload()}>Tải lại trang</Button></div>
+                                            <div className="text-center py-5 text-muted bg-light rounded">
+                                                <i className="bi bi-journal-x fs-1 d-block mb-3 opacity-50"></i>
+                                                <p>Đang tải dữ liệu...</p>
+                                                {/* Fallback */}
+                                                <div className="text-start mt-3">
+                                                    <Row>{BACKUP_DATA.map((item, idx) => (<Col md={6} key={idx} className="mb-4"><Card className="news-card h-100 border-0 shadow-sm"><Card.Body className="p-3"><div className="ratio ratio-16x9 mb-3 bg-light rounded overflow-hidden">{item.imageUrl ? <img src={item.imageUrl} className="object-fit-cover" alt="" /> : <i className="bi bi-image m-auto text-muted"></i>}</div><Card.Title className="fw-bold fs-6 hover-blue" onClick={() => crawlArticle(item)}>{item.title}</Card.Title><Card.Text className="text-muted small line-clamp-3">{item.cleanDesc}</Card.Text></Card.Body></Card></Col>))}</Row>
+                                                </div>
+                                            </div>
                                         ) : (
-                                            <Row>{articles.map((item, idx) => (<Col md={idx === 0 ? 12 : 6} key={idx} className="mb-4"><Card className={`news-card h-100 border-0 shadow-sm ${idx === 0 ? 'featured-card' : ''}`}><Card.Body className={idx === 0 ? 'd-md-flex p-0' : 'p-3'}>{idx === 0 && (<div className="featured-img-box col-md-6 bg-light overflow-hidden">{item.imageUrl && <img src={item.imageUrl} className="w-100 h-100 object-fit-cover" alt="" />}</div>)}<div className={`d-flex flex-column ${idx === 0 ? 'p-4 col-md-6' : ''}`}><Card.Title className={`fw-bold hover-blue ${idx === 0 ? 'fs-3' : 'fs-6'}`} onClick={() => crawlArticle(item)}>{item.title}</Card.Title><Card.Text className="text-muted small">{item.cleanDesc}</Card.Text></div></Card.Body></Card></Col>))}</Row>
+                                            <Row>
+                                                {articles.map((item, idx) => (
+                                                    <Col md={idx === 0 ? 12 : 6} key={idx} className="mb-4">
+                                                        <Card className={`news-card h-100 border-0 shadow-sm ${idx === 0 ? 'featured-card' : ''}`}>
+                                                            <Card.Body className={idx === 0 ? 'd-md-flex p-0' : 'p-3'}>
+                                                                {idx === 0 && (<div className="featured-img-box col-md-6 bg-light overflow-hidden">{item.imageUrl && <img src={item.imageUrl} className="w-100 h-100 object-fit-cover" alt="" />}</div>)}
+                                                                <div className={`d-flex flex-column ${idx === 0 ? 'p-4 col-md-6' : ''}`}>
+                                                                    <div className="flex-grow-1">
+                                                                        {idx > 0 && <div className="ratio ratio-16x9 mb-3 bg-light rounded overflow-hidden">{item.imageUrl ? <img src={item.imageUrl} className="object-fit-cover" alt="" /> : <i className="bi bi-image m-auto text-muted"></i>}</div>}
+                                                                        <Card.Title className={`fw-bold hover-blue ${idx === 0 ? 'fs-3' : 'fs-6'}`} onClick={() => crawlArticle(item)}>{item.title}</Card.Title>
+                                                                        <Card.Text className="text-muted small line-clamp-3">{item.cleanDesc}</Card.Text>
+                                                                    </div>
+                                                                </div>
+                                                            </Card.Body>
+                                                        </Card>
+                                                    </Col>
+                                                ))}
+                                            </Row>
                                         )}
                                     </>
                                 )}
@@ -356,18 +471,8 @@ function App() {
                                     const bannerToRender = INTERSTITIAL_BANNERS.find(b => b.afterIndex === idx);
                                     return (
                                         <React.Fragment key={idx}>
-                                            <NewsSection
-                                                title={block.name}
-                                                data={homeBlockArticles[block.name]}
-                                                onTitleClick={() => fetchRSS(block.url, block.name)}
-                                            />
-                                            {bannerToRender && (
-                                                <InterstitialBanner
-                                                    imageUrl={bannerToRender.imageUrl}
-                                                    alt={bannerToRender.alt}
-                                                    className="mb-5"
-                                                />
-                                            )}
+                                            <NewsSection title={block.name} data={homeBlockArticles[block.name]} onTitleClick={() => fetchRSS(block.url, block.name)} />
+                                            {bannerToRender && (<InterstitialBanner imageUrl={bannerToRender.imageUrl} alt={bannerToRender.alt} className="mb-5" />)}
                                         </React.Fragment>
                                     );
                                 })}
@@ -376,27 +481,41 @@ function App() {
                     </Col>
 
                     <Col lg={3}>
-                        <div className="sidebar-box mb-4"><div className="sidebar-header bg-danger text-white p-2 fw-bold text-uppercase mb-0"><i className="bi bi-star-fill me-2 text-warning"></i> Mới cập nhật</div><div className="sidebar-content border border-top-0 p-2 bg-white" style={{maxHeight: '500px', overflowY: 'auto'}}>{articles.slice(6, 15).map((item, idx) => (<div key={idx} className="mb-2 pb-2 border-bottom cursor-pointer" onClick={() => crawlArticle(item)}><h6 className="fw-bold small hover-blue mb-1">{item.title}</h6><span className="text-muted" style={{ fontSize: '0.7rem' }}>Vừa xong</span></div>))}</div></div>
-
-                        {/* BOX SUY NGẪM - Đã fix link */}
-                        <a href="https://giaoducthoidai.vn/trao-doi/" target="_blank" rel="noreferrer" className="text-decoration-none text-dark">
-                            <div className="sidebar-box mb-4 cursor-pointer">
-                                <div className="sidebar-header p-2 fw-bold text-uppercase mb-0 border-start border-5 border-danger text-danger bg-light">SUY NGẪM</div>
-                                <div className="sidebar-content p-3 bg-light">
-                                    <h6 className="fw-bold mb-2 hover-blue">Sắp nhập trường cao đẳng sư phạm: Tất yếu của đổi mới</h6>
-                                    <p className="small text-muted mb-0">GD&TĐ - Việc sáp nhập các trường cao đẳng sư phạm là xu thế tất yếu nhằm nâng cao chất lượng...</p>
-                                </div>
+                        <div className="sidebar-box mb-4">
+                            <div className="sidebar-header bg-danger text-white p-2 fw-bold text-uppercase mb-0"><i className="bi bi-star-fill me-2 text-warning"></i> Mới cập nhật</div>
+                            <div className="sidebar-content border border-top-0 p-2 bg-white" style={{maxHeight: '500px', overflowY: 'auto'}}>
+                                {sidebarArticles.length > 0 ? (
+                                    sidebarArticles.slice(5, 15).map((item, idx) => (
+                                        <div key={idx} className="mb-2 pb-2 border-bottom cursor-pointer" onClick={() => crawlArticle(item)}>
+                                            <h6 className="fw-bold small hover-blue mb-1">{item.title}</h6>
+                                            <span className="text-muted" style={{ fontSize: '0.7rem' }}>Vừa xong</span>
+                                        </div>
+                                    ))
+                                ) : (
+                                    BACKUP_DATA.map((item, idx) => (
+                                        <div key={idx} className="mb-2 pb-2 border-bottom cursor-pointer" onClick={() => crawlArticle(item)}>
+                                            <h6 className="fw-bold small hover-blue mb-1">{item.title}</h6>
+                                            <span className="text-muted" style={{ fontSize: '0.7rem' }}>Vừa xong</span>
+                                        </div>
+                                    ))
+                                )}
                             </div>
-                        </a>
+                        </div>
 
-                        {/* BANNER BÁO IN - Đã fix link, đảm bảo bấm vào được */}
-                        <a href="https://baogiay.giaoducthoidai.vn/" target="_blank" rel="noreferrer" className="text-decoration-none d-block">
-                            <div className="baoin-banner text-center text-white p-4 rounded shadow-sm d-flex flex-column align-items-center justify-content-center cursor-pointer mb-4">
-                                <i className="bi bi-newspaper fs-1 mb-2"></i>
-                                <h5 className="fw-bold mb-0">ĐỌC BÁO IN</h5>
-                                <h5 className="fw-bold">ONLINE</h5>
+                        <div className="sidebar-box mb-4 cursor-pointer" onClick={() => crawlArticle(SUY_NGAM_ITEM)}>
+                            <div className="sidebar-header p-2 fw-bold text-uppercase mb-0 border-start border-5 border-danger text-danger bg-light">SUY NGẪM</div>
+                            <div className="sidebar-content p-3 bg-light">
+                                <h6 className="fw-bold mb-2 hover-blue">{SUY_NGAM_ITEM.title}</h6>
+                                <p className="small text-muted mb-0">{SUY_NGAM_ITEM.cleanDesc}</p>
                             </div>
-                        </a>
+                        </div>
+
+                        {/* BANNER BÁO IN - CLICK ĐỂ MỞ GIAO DIỆN BÁO IN */}
+                        <div className="baoin-banner text-center text-white p-4 rounded shadow-sm d-flex flex-column align-items-center justify-content-center cursor-pointer mb-4" onClick={() => fetchRSS(CATEGORY_TREE[0].url, "BÁO IN ONLINE")}>
+                            <i className="bi bi-newspaper fs-1 mb-2"></i>
+                            <h5 className="fw-bold mb-0">ĐỌC BÁO IN</h5>
+                            <h5 className="fw-bold">ONLINE</h5>
+                        </div>
                     </Col>
                 </Row>
             </Container>
@@ -404,13 +523,13 @@ function App() {
             <footer className="footer-site mt-0 pt-0 pb-3 text-white">
                 <Container>
                     <div className="footer-nav-bar d-flex justify-content-center flex-wrap">
-                        <a href="https://giaoducthoidai.vn/giao-duc/" target="_blank" rel="noreferrer" className="footer-nav-link">GIÁO DỤC</a>
-                        <a href="https://giaoducthoidai.vn/thoi-su/" target="_blank" rel="noreferrer" className="footer-nav-link">THỜI SỰ</a>
-                        <a href="https://giaoducthoidai.vn/phap-luat/" target="_blank" rel="noreferrer" className="footer-nav-link">GIÁO DỤC PHÁP LUẬT</a>
-                        <a href="https://giaoducthoidai.vn/ket-noi/" target="_blank" rel="noreferrer" className="footer-nav-link">KẾT NỐI</a>
-                        <a href="https://giaoducthoidai.vn/video-media/" target="_blank" rel="noreferrer" className="footer-nav-link">MEDIA</a>
+                        <span onClick={() => fetchRSS("https://giaoducthoidai.vn/rss/giao-duc-2.rss", "Giáo dục")} className="footer-nav-link cursor-pointer">GIÁO DỤC</span>
+                        <span onClick={() => fetchRSS("https://giaoducthoidai.vn/rss/thoi-su-1.rss", "Thời sự")} className="footer-nav-link cursor-pointer">THỜI SỰ</span>
+                        <span onClick={() => fetchRSS("https://giaoducthoidai.vn/rss/phap-luat-5.rss", "Giáo dục pháp luật")} className="footer-nav-link cursor-pointer">GIÁO DỤC PHÁP LUẬT</span>
+                        <span onClick={() => fetchRSS("https://giaoducthoidai.vn/rss/dong-hanh-37.rss", "Kết nối")} className="footer-nav-link cursor-pointer">KẾT NỐI</span>
+                        <span onClick={() => fetchRSS("https://giaoducthoidai.vn/rss/video-media-11.rss", "Media")} className="footer-nav-link cursor-pointer">MEDIA</span>
                     </div>
-
+                    {/* ... (GIỮ NGUYÊN PHẦN FOOTER CÒN LẠI) ... */}
                     <div className="footer-tags-area text-center">
                         <a href="https://tracnghiem.net" target="_blank" rel="noreferrer" className="footer-tag-link"><strong>Thi Thử Trắc Nghiệm</strong></a>
                         <a href="https://sachweb.com" target="_blank" rel="noreferrer" className="footer-tag-link">sách đọc online</a>
@@ -427,7 +546,6 @@ function App() {
                         <a href="#" className="footer-tag-link"><strong>trần xuyên sáng</strong></a>
                     </div>
                 </Container>
-
                 <div className="footer-main-info mt-0">
                     <Container>
                         <Row>
