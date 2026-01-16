@@ -267,7 +267,7 @@ function App() {
                     <Col lg={9}>
                         {loading ? (<div className="text-center py-5"><Spinner animation="border" variant="danger" /></div>) : (
                             <>
-                                {/* Toàn cảnh */}
+                                {/* Toàn cảnh - Sự kiện (Chỉ hiện ở Trang chủ) */}
                                 {currentCatName === "Trang chủ" && articles.length > 0 && (
                                     <div className="mb-5">
                                         <div className="toan-canh-title mb-4 d-flex align-items-center"><h4 className="fw-bold text-danger m-0" style={{ borderBottom: '3px solid #dc3545', paddingBottom: '5px' }}>Toàn cảnh - Sự kiện</h4><span className="flex-grow-1 ms-3 border-bottom"></span></div>
@@ -278,11 +278,12 @@ function App() {
                                     </div>
                                 )}
 
+                                {/* Banner xen kẽ sau Toàn cảnh */}
                                 {currentCatName === "Trang chủ" && (
                                     <InterstitialBanner imageUrl={banner3} alt="Quảng cáo nổi bật" />
                                 )}
 
-                                {/* List tin thường (Không ở trang chủ) */}
+                                {/* Danh sách tin thường (Khi xem chuyên mục khác Trang chủ) */}
                                 {currentCatName !== "Trang chủ" && (
                                     <>
                                         <div className="section-title mb-4 border-bottom pb-2 border-danger border-2"><h5 className="fw-bold text-danger text-uppercase mb-0">{currentCatName}</h5></div>
@@ -294,14 +295,13 @@ function App() {
                                     </>
                                 )}
 
-
+                                {/* Các khối tin tức trang chủ + Banner xen kẽ */}
                                 {currentCatName === "Trang chủ" && HOME_BLOCKS.map((block, idx) => {
-                                    const bannerToRender = INTERSTITIAL_BANNERS.find(b => b.afterIndex === idx);
+                                    const bannerToRender = INTERSTITIAL_BANNERS.find(b => b.afterIndex === idx); // Đã định nghĩa INTERSTITIAL_BANNERS ở ngoài hoặc trên
                                     return (
                                         <React.Fragment key={idx}>
                                             <NewsSection
                                                 title={block.name}
-                                                // Lấy dữ liệu từ state theo tên block. Nếu chưa có -> undefined -> sẽ hiện Skeleton
                                                 data={homeBlockArticles[block.name]}
                                                 onTitleClick={() => fetchRSS(block.url, block.name)}
                                             />
@@ -319,11 +319,33 @@ function App() {
                         )}
                     </Col>
 
-
+                    {/* Sidebar */}
                     <Col lg={3}>
-                        <div className="sidebar-box mb-4"><div className="sidebar-header bg-danger text-white p-2 fw-bold text-uppercase mb-0"><i className="bi bi-star-fill me-2 text-warning"></i> Mới cập nhật</div><div className="sidebar-content border border-top-0 p-2 bg-white" style={{maxHeight: '500px', overflowY: 'auto'}}>{articles.slice(6, 15).map((item, idx) => (<div key={idx} className="mb-2 pb-2 border-bottom cursor-pointer" onClick={() => crawlArticle(item)}><h6 className="fw-bold small hover-blue mb-1">{item.title}</h6><span className="text-muted" style={{ fontSize: '0.7rem' }}>Vừa xong</span></div>))}</div></div>
+                        {/* Box Mới cập nhật */}
+                        <div className="sidebar-box mb-4">
+                            <div className="sidebar-header bg-danger text-white p-2 fw-bold text-uppercase mb-0"><i className="bi bi-star-fill me-2 text-warning"></i> Mới cập nhật</div>
+                            <div className="sidebar-content border border-top-0 p-2 bg-white" style={{maxHeight: '500px', overflowY: 'auto'}}>
+                                {/* Sử dụng hàm crawlArticle để mở Modal đọc tin khi click vào tin Mới cập nhật */}
+                                {articles.slice(6, 15).map((item, idx) => (
+                                    <div key={idx} className="mb-2 pb-2 border-bottom cursor-pointer" onClick={() => crawlArticle(item)}>
+                                        <h6 className="fw-bold small hover-blue mb-1">{item.title}</h6>
+                                        <span className="text-muted" style={{ fontSize: '0.7rem' }}>Vừa xong</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Box Suy ngẫm (Tĩnh hoặc có thể thay đổi sau) */}
                         <div className="sidebar-box mb-4"><div className="sidebar-header p-2 fw-bold text-uppercase mb-0 border-start border-5 border-danger text-danger bg-light">SUY NGẪM</div><div className="sidebar-content p-3 bg-light"><h6 className="fw-bold mb-2">Sắp nhập trường cao đẳng sư phạm: Tất yếu của đổi mới</h6><p className="small text-muted mb-0">GD&TĐ - Việc sáp nhập các trường cao đẳng sư phạm là xu thế tất yếu nhằm nâng cao chất lượng...</p></div></div>
-                        <div className="baoin-banner text-center text-white p-4 rounded shadow-sm d-flex flex-column align-items-center justify-content-center cursor-pointer mb-4"><i className="bi bi-newspaper fs-1 mb-2"></i><h5 className="fw-bold mb-0">ĐỌC BÁO IN</h5><h5 className="fw-bold">ONLINE</h5></div>
+
+                        {/* Banner Đọc báo in Online - Đã sửa thành thẻ a để chuyển trang */}
+                        <a href="https://baogiay.giaoducthoidai.vn/" target="_blank" rel="noreferrer" className="text-decoration-none">
+                            <div className="baoin-banner text-center text-white p-4 rounded shadow-sm d-flex flex-column align-items-center justify-content-center cursor-pointer mb-4">
+                                <i className="bi bi-newspaper fs-1 mb-2"></i>
+                                <h5 className="fw-bold mb-0">ĐỌC BÁO IN</h5>
+                                <h5 className="fw-bold">ONLINE</h5>
+                            </div>
+                        </a>
                     </Col>
                 </Row>
             </Container>
