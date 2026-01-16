@@ -331,29 +331,38 @@ function App() {
             {/* Footer */}
             <footer className="footer-site mt-0 pt-0 pb-3 text-white">
                 <Container>
+                    {/* Footer Nav Bar - Trỏ về các chuyên mục trên trang gốc giaoducthoidai.vn */}
                     <div className="footer-nav-bar d-flex justify-content-center flex-wrap">
-                        <a href="#" className="footer-nav-link">GIÁO DỤC</a>
-                        <a href="#" className="footer-nav-link">THỜI SỰ</a>
-                        <a href="#" className="footer-nav-link">GIÁO DỤC PHÁP LUẬT</a>
-                        <a href="#" className="footer-nav-link">KẾT NỐI</a>
-                        <a href="#" className="footer-nav-link">MEDIA</a>
+                        <a href="https://giaoducthoidai.vn/giao-duc/" target="_blank" rel="noreferrer" className="footer-nav-link">GIÁO DỤC</a>
+                        <a href="https://giaoducthoidai.vn/thoi-su/" target="_blank" rel="noreferrer" className="footer-nav-link">THỜI SỰ</a>
+                        <a href="https://giaoducthoidai.vn/phap-luat/" target="_blank" rel="noreferrer" className="footer-nav-link">GIÁO DỤC PHÁP LUẬT</a>
+                        <a href="https://giaoducthoidai.vn/ket-noi/" target="_blank" rel="noreferrer" className="footer-nav-link">KẾT NỐI</a>
+                        <a href="https://giaoducthoidai.vn/video-media/" target="_blank" rel="noreferrer" className="footer-nav-link">MEDIA</a>
                     </div>
+
+                    {/* Tags Area - Trỏ về các website đối tác hoặc liên kết SEO */}
                     <div className="footer-tags-area text-center">
-                        <a href="#" className="footer-tag-link"><strong>Thi Thử Trắc Nghiệm</strong></a>
-                        <a href="#" className="footer-tag-link">sách đọc online</a>
+                        <a href="https://tracnghiem.net" target="_blank" rel="noreferrer" className="footer-tag-link"><strong>Thi Thử Trắc Nghiệm</strong></a>
+                        <a href="https://sachweb.com" target="_blank" rel="noreferrer" className="footer-tag-link">sách đọc online</a>
                         <a href="#" className="footer-tag-link">The Fullton</a>
                         <a href="#" className="footer-tag-link"><strong>Woku Shop</strong> - Bản quyền giá tốt</a>
-                        <a href="#" className="footer-tag-link"><strong>cho thuê nhà</strong> tại Chothuenha.me</a>
-                        <a href="#" className="footer-tag-link"><strong>Thuecanho123</strong> - Website cho thuê căn hộ uy tín</a>
-                        <a href="#" className="footer-tag-link">tra cứu điểm</a>
-                        <a href="#" className="footer-tag-link">thời tiết ngày mai</a>
-                        <a href="#" className="footer-tag-link">Sách giáo khoa</a>
-                        <a href="#" className="footer-tag-link">Tìm <strong>bất động sản</strong> tại Bds123.vn</a>
-                        <a href="#" className="footer-tag-link">Tìm <strong>phòng trọ Hồ Chí Minh</strong> tại Phongtro123.com</a>
-                        <a href="#" className="footer-tag-link"><strong>Slice Master</strong> Upgrade Version At Slicemaster.net</a>
+
+                        {/* Các link có địa chỉ cụ thể trong text */}
+                        <a href="https://chothuenha.me" target="_blank" rel="noreferrer" className="footer-tag-link"><strong>cho thuê nhà</strong> tại Chothuenha.me</a>
+                        <a href="https://thuecanho123.com" target="_blank" rel="noreferrer" className="footer-tag-link"><strong>Thuecanho123</strong> - Website cho thuê căn hộ uy tín</a>
+
+                        <a href="https://diemthi.tuyensinh247.com" target="_blank" rel="noreferrer" className="footer-tag-link">tra cứu điểm</a>
+                        <a href="https://nchmf.gov.vn" target="_blank" rel="noreferrer" className="footer-tag-link">thời tiết ngày mai</a>
+                        <a href="https://hanhtrangso.nxbgd.vn" target="_blank" rel="noreferrer" className="footer-tag-link">Sách giáo khoa</a>
+
+                        <a href="https://bds123.vn" target="_blank" rel="noreferrer" className="footer-tag-link">Tìm <strong>bất động sản</strong> tại Bds123.vn</a>
+                        <a href="https://phongtro123.com/tinh-thanh/ho-chi-minh" target="_blank" rel="noreferrer" className="footer-tag-link">Tìm <strong>phòng trọ Hồ Chí Minh</strong> tại Phongtro123.com</a>
+                        <a href="https://slicemaster.net" target="_blank" rel="noreferrer" className="footer-tag-link"><strong>Slice Master</strong> Upgrade Version At Slicemaster.net</a>
                         <a href="#" className="footer-tag-link"><strong>trần xuyên sáng</strong></a>
                     </div>
                 </Container>
+
+                {/* Main Footer Info (Phần thông tin tòa soạn giữ nguyên) */}
                 <div className="footer-main-info mt-0">
                     <Container>
                         <Row>
@@ -364,6 +373,7 @@ function App() {
                                 </div>
                                 <div className="footer-logo-sub text-center">BÁO GIÁO DỤC & THỜI ĐẠI</div>
                             </Col>
+
                             <Col md={5} className="mb-4 mb-md-0 footer-info-text">
                                 <p className="mb-2 fw-bold text-uppercase">CƠ QUAN CỦA BỘ GIÁO DỤC VÀ ĐÀO TẠO - DIỄN ĐÀN TOÀN XÃ HỘI VÌ SỰ NGHIỆP GIÁO DỤC</p>
                                 <p className="mb-1">Cơ quan chủ quản: BỘ GIÁO DỤC VÀ ĐÀO TẠO</p>
@@ -372,18 +382,21 @@ function App() {
                                 <p className="mb-1">Phó Tổng Biên tập: <strong>Dương Thanh Hương - Nguyễn Đức Tuân</strong></p>
                                 <p className="mb-0">® Ghi rõ nguồn "Báo Giáo dục & Thời đại" khi phát hành lại thông tin từ website.</p>
                             </Col>
+
                             <Col md={4} className="footer-info-text">
                                 <div className="footer-heading">TRỤ SỞ CHÍNH</div>
                                 <p className="mb-1">Tòa soạn: 15 Hai Bà Trưng - P.Cửa Nam - Hà Nội.</p>
                                 <p className="mb-1">Điện thoại: 024 3936 9800</p>
                                 <p className="mb-1">Hotline: 0967 335 089</p>
                                 <p className="mb-3">Email: gdtddientu@gmail.com</p>
+
                                 <div className="footer-heading">LIÊN HỆ QUẢNG CÁO, TRUYỀN THÔNG VÀ ĐẶT BÁO</div>
                                 <p className="mb-1">Phòng Truyền thông và Dự án</p>
                                 <p className="mb-0">Hotline: 0886 059 988</p>
                             </Col>
                         </Row>
                     </Container>
+
                     <div className="footer-bottom text-center small opacity-75 mt-3 pt-2 border-top border-white border-opacity-25">
                         <p className="m-0">© 2025 Báo Giáo dục và Thời đại. All rights reserved.</p>
                     </div>
